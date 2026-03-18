@@ -1,0 +1,48 @@
+# Java
+*.class
+*.jar
+*.war
+*.ear
+target/
+.classpath
+.project
+.settings/
+.idea/
+*.iml
+out/
+
+# Maven
+pom.xml.tag
+pom.xml.releaseBackup
+release.properties
+dependency-reduced-pom.xml
+
+# Gradle
+.gradle
+build/
+gradle/
+
+# Node/React
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.env
+.env.local
+dist/
+build/
+
+# IDEs
+.vscode/
+.DS_Store
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Logs
+logs/
+*.log
