@@ -3,6 +3,7 @@ package com.gestaoestoque.entity;
 import com.gestaoestoque.enums.Perfil;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -21,29 +22,31 @@ public class Usuario {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empresa_id", nullable = false)
-    private Empresa empresa;
+    private Empresa company;
 
-    @Column(nullable = false, length = 150)
-    private String nome;
+    @Column(name = "nome", nullable = false, length = 150)
+    private String name;
 
-    @Column(nullable = false, unique = true, length = 150)
+    @Column(name = "email", nullable = false, unique = true, length = 150)
     private String email;
 
-    @Column(nullable = false, length = 255)
-    private String senha;
+    @Column(name = "senha", nullable = false, length = 255)
+    private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private Perfil perfil = Perfil.OPERADOR;
+    @Column(name = "perfil", nullable = false, length = 20)
+    private Perfil role = Perfil.OPERADOR;
 
-    @Column(nullable = false)
-    private Boolean ativo = true;
+    @Column(name = "ativo", nullable = false)
+    private Boolean active = true;
 
+    @Column(name = "token_recuperacao")
+    private String resetToken;
+
+    @Column(name = "token_recuperacao_expiracao")
+    private LocalDateTime resetTokenExpiry;
+
+    @CreationTimestamp
     @Column(name = "criado_em", nullable = false, updatable = false)
-    private LocalDateTime criadoEm;
-
-    @PrePersist
-    protected void prePersist() {
-        this.criadoEm = LocalDateTime.now();
-    }
+    private LocalDateTime createdAt;
 }
