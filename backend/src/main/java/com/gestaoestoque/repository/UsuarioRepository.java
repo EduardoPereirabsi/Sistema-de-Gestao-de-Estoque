@@ -12,7 +12,11 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     Optional<Usuario> findByEmail(String email);
 
+    List<Usuario> findAllByEmail(String email);
+
     boolean existsByEmail(String email);
+
+    Optional<Usuario> findByResetToken(String resetToken);
 
     List<Usuario> findByEmpresaId(Long empresaId);
 
