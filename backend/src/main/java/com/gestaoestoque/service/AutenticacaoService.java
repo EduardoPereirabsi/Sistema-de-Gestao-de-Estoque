@@ -35,18 +35,18 @@ public class AutenticacaoService {
         var usuario = usuarioRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RequisicaoInvalidaException("Email ou senha inválidos"));
 
-        if (!passwordEncoder.matches(request.getPassword(), usuario.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), usuario.getSenha())) {
             throw new RequisicaoInvalidaException("Email ou senha inválidos");
         }
 
-        if (!usuario.getActive()) {
+        if (!usuario.getAtivo()) {
             throw new RequisicaoInvalidaException("Usuário inativo. Contate o administrador.");
         }
 
         if (request.getCompanyId() == null) {
             List<EmpresaResponse> companies = usuarioRepository.findAllByEmail(request.getEmail())
                     .stream()
-                    .map(u -> new EmpresaResponse(u.getCompany().getId(), u.getCompany().getNome()))
+                    .map(u -> new EmpresaResponse(u.getEmpresa().getId(), u.getEmpresa().getNome()))
                     .distinct()
                     .toList();
             if (companies.size() > 1) {
@@ -71,12 +71,12 @@ public class AutenticacaoService {
         empresa = empresaRepository.save(empresa);
 
         Usuario usuario = Usuario.builder()
-                .name(request.getName())
+                .nome(request.getName())
                 .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .role(Perfil.ADMIN)
-                .active(true)
-                .company(empresa)
+                .senha(passwordEncoder.encode(request.getPassword()))
+                .perfil(Perfil.ADMIN)
+                .ativo(true)
+                .empresa(empresa)
                 .build();
         usuario = usuarioRepository.save(usuario);
 
@@ -89,8 +89,8 @@ public class AutenticacaoService {
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
 
         String token = UUID.randomUUID().toString();
-        usuario.setResetToken(token);
-        usuario.setResetTokenExpiry(LocalDateTime.now().plusHours(2));
+        usuario.setTokenRecuperacao(token);
+        usuario.setTokenRecuperacaoExpiracao(LocalDateTime.now().plusHours(2));
         usuarioRepository.save(usuario);
 
         // Em produção: enviar por email. Por ora, exibe no console.
@@ -99,16 +99,16 @@ public class AutenticacaoService {
 
     @Transactional
     public void resetPassword(String token, String newPassword) {
-        var usuario = usuarioRepository.findByResetToken(token)
+        var usuario = usuarioRepository.findByTokenRecuperacao(token)
                 .orElseThrow(() -> new RequisicaoInvalidaException("Token inválido ou expirado"));
 
-        if (usuario.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
+        if (usuario.getTokenRecuperacaoExpiracao().isBefore(LocalDateTime.now())) {
             throw new RequisicaoInvalidaException("Token expirado");
         }
 
-        usuario.setPassword(passwordEncoder.encode(newPassword));
-        usuario.setResetToken(null);
-        usuario.setResetTokenExpiry(null);
+        usuario.setSenha(passwordEncoder.encode(newPassword));
+        usuario.setTokenRecuperacao(null);
+        usuario.setTokenRecuperacaoExpiracao(null);
         usuarioRepository.save(usuario);
     }
 
@@ -118,12 +118,12 @@ public class AutenticacaoService {
 
         UsuarioResponse userResponse = UsuarioResponse.builder()
                 .id(usuario.getId())
-                .name(usuario.getName())
+                .name(usuario.getNome())
                 .email(usuario.getEmail())
-                .role(usuario.getRole())
-                .active(usuario.getActive())
-                .companyName(usuario.getCompany().getNome())
-                .createdAt(usuario.getCreatedAt())
+                .role(usuario.getPerfil())
+                .active(usuario.getAtivo())
+                .companyName(usuario.getEmpresa().getNome())
+                .createdAt(usuario.getCriadoEm())
                 .build();
 
         return AutenticacaoResponse.builder()

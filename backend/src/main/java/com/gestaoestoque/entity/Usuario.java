@@ -22,31 +22,31 @@ public class Usuario {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "empresa_id", nullable = false)
-    private Empresa company;
+    private Empresa empresa;
 
     @Column(name = "nome", nullable = false, length = 150)
-    private String name;
+    private String nome;
 
     @Column(name = "email", nullable = false, unique = true, length = 150)
     private String email;
 
     @Column(name = "senha", nullable = false, length = 255)
-    private String password;
+    private String senha;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "perfil", nullable = false, length = 20)
-    private Perfil role = Perfil.OPERADOR;
+    private Perfil perfil = Perfil.OPERADOR;
 
     @Column(name = "ativo", nullable = false)
-    private Boolean active = true;
+    private Boolean ativo = true;
 
     @Column(name = "token_recuperacao")
-    private String resetToken;
+    private String tokenRecuperacao;
 
     @Column(name = "token_recuperacao_expiracao")
-    private LocalDateTime resetTokenExpiry;
+    private LocalDateTime tokenRecuperacaoExpiracao;
 
     @CreationTimestamp
     @Column(name = "criado_em", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime criadoEm;
 }
