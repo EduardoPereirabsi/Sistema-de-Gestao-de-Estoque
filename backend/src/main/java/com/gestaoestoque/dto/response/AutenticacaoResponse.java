@@ -17,8 +17,8 @@ public class AutenticacaoResponse {
     private String refreshToken;
 
     @Schema(description = "Dados do usuário autenticado")
-    private UsuarioResponse user;
+    private UsuarioResponse usuario;
 
     @Schema(description = "Lista de empresas do usuário (retornada quando há múltiplas)")
-    private List<EmpresaResponse> companies;
+    private List<EmpresaResponse> empresas;
 }

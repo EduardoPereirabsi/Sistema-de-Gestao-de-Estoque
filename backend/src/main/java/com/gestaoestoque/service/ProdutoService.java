@@ -30,98 +30,98 @@ public class ProdutoService {
     private final EmpresaContexto empresaContexto;
 
     public Page<ProdutoResponse> findAll(Pageable pageable) {
-        Long companyId = empresaContexto.getCurrentCompanyId();
-        return produtoRepository.findByCompanyId(companyId, pageable).map(this::mapToResponse);
+        Long empresaId = empresaContexto.getCurrentCompanyId();
+        return produtoRepository.findByEmpresaId(empresaId, pageable).map(this::mapToResponse);
     }
 
     public ProdutoResponse findById(Long id) {
-        Produto product = produtoRepository.findById(id)
+        Produto produto = produtoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Produto não encontrado com ID: " + id));
-        return mapToResponse(product);
+        return mapToResponse(produto);
     }
 
-    public Page<ProdutoResponse> search(String name, Pageable pageable) {
-        Long companyId = empresaContexto.getCurrentCompanyId();
-        return produtoRepository.findByNameContainingIgnoreCaseAndCompanyId(name, companyId, pageable).map(this::mapToResponse);
+    public Page<ProdutoResponse> search(String nome, Pageable pageable) {
+        Long empresaId = empresaContexto.getCurrentCompanyId();
+        return produtoRepository.findByNomeContainingIgnoreCaseAndEmpresaId(nome, empresaId, pageable).map(this::mapToResponse);
     }
 
     public List<ProdutoResponse> findLowStock() {
-        Long companyId = empresaContexto.getCurrentCompanyId();
-        return produtoRepository.findLowStockProductsByCompanyId(companyId).stream()
+        Long empresaId = empresaContexto.getCurrentCompanyId();
+        return produtoRepository.findLowStockProductsByEmpresaId(empresaId).stream()
                 .map(this::mapToResponse)
                 .toList();
     }
 
     @Transactional
     public ProdutoResponse create(ProdutoRequest request) {
-        Long companyId = empresaContexto.getCurrentCompanyId();
-        if (produtoRepository.existsBySkuAndCompanyId(request.getSku(), companyId)) {
+        Long empresaId = empresaContexto.getCurrentCompanyId();
+        if (produtoRepository.existsBySkuAndEmpresaId(request.getSku(), empresaId)) {
             throw new RecursoDuplicadoException("Código já cadastrado: " + request.getSku());
         }
 
-        Produto product = Produto.builder()
-                .name(request.getName())
+        Produto produto = Produto.builder()
+                .nome(request.getNome())
                 .sku(request.getSku())
-                .description(request.getDescription())
-                .price(request.getPrice())
-                .costPrice(request.getCostPrice() != null ? request.getCostPrice() : java.math.BigDecimal.ZERO)
-                .quantity(request.getQuantity())
-                .minQuantity(request.getMinQuantity() != null ? request.getMinQuantity() : 0)
-                .company(empresaContexto.getCurrentUser().getCompany())
+                .descricao(request.getDescricao())
+                .preco(request.getPreco())
+                .precoCusto(request.getPrecoCusto() != null ? request.getPrecoCusto() : java.math.BigDecimal.ZERO)
+                .quantidade(request.getQuantidade())
+                .quantidadeMinima(request.getQuantidadeMinima() != null ? request.getQuantidadeMinima() : 0)
+                .empresa(empresaContexto.getCurrentUser().getEmpresa())
                 .build();
 
-        if (request.getCategoryId() != null) {
-            Categoria category = categoriaRepository.findById(request.getCategoryId())
-                    .orElseThrow(() -> new RecursoNaoEncontradoException("Categoria não encontrada com ID: " + request.getCategoryId()));
-            product.setCategory(category);
+        if (request.getCategoriaId() != null) {
+            Categoria categoria = categoriaRepository.findById(request.getCategoriaId())
+                    .orElseThrow(() -> new RecursoNaoEncontradoException("Categoria não encontrada com ID: " + request.getCategoriaId()));
+            produto.setCategoria(categoria);
         }
 
-        if (request.getSupplierId() != null) {
-            Fornecedor supplier = fornecedorRepository.findById(request.getSupplierId())
-                    .orElseThrow(() -> new RecursoNaoEncontradoException("Fornecedor não encontrado com ID: " + request.getSupplierId()));
-            product.setSupplier(supplier);
+        if (request.getFornecedorId() != null) {
+            Fornecedor fornecedor = fornecedorRepository.findById(request.getFornecedorId())
+                    .orElseThrow(() -> new RecursoNaoEncontradoException("Fornecedor não encontrado com ID: " + request.getFornecedorId()));
+            produto.setFornecedor(fornecedor);
         }
 
-        produtoRepository.save(product);
-        return mapToResponse(product);
+        produtoRepository.save(produto);
+        return mapToResponse(produto);
     }
 
     @Transactional
     public ProdutoResponse update(Long id, ProdutoRequest request) {
-        Produto product = produtoRepository.findById(id)
+        Produto produto = produtoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Produto não encontrado com ID: " + id));
 
-        Long companyId = empresaContexto.getCurrentCompanyId();
-        if (!product.getSku().equals(request.getSku()) && produtoRepository.existsBySkuAndCompanyId(request.getSku(), companyId)) {
+        Long empresaId = empresaContexto.getCurrentCompanyId();
+        if (!produto.getSku().equals(request.getSku()) && produtoRepository.existsBySkuAndEmpresaId(request.getSku(), empresaId)) {
             throw new RecursoDuplicadoException("Código já cadastrado: " + request.getSku());
         }
 
-        product.setName(request.getName());
-        product.setSku(request.getSku());
-        product.setDescription(request.getDescription());
-        product.setPrice(request.getPrice());
-        if (request.getCostPrice() != null) product.setCostPrice(request.getCostPrice());
-        product.setQuantity(request.getQuantity());
-        if (request.getMinQuantity() != null) product.setMinQuantity(request.getMinQuantity());
+        produto.setNome(request.getNome());
+        produto.setSku(request.getSku());
+        produto.setDescricao(request.getDescricao());
+        produto.setPreco(request.getPreco());
+        if (request.getPrecoCusto() != null) produto.setPrecoCusto(request.getPrecoCusto());
+        produto.setQuantidade(request.getQuantidade());
+        if (request.getQuantidadeMinima() != null) produto.setQuantidadeMinima(request.getQuantidadeMinima());
 
-        if (request.getCategoryId() != null) {
-            Categoria category = categoriaRepository.findById(request.getCategoryId())
+        if (request.getCategoriaId() != null) {
+            Categoria categoria = categoriaRepository.findById(request.getCategoriaId())
                     .orElseThrow(() -> new RecursoNaoEncontradoException("Categoria não encontrada"));
-            product.setCategory(category);
+            produto.setCategoria(categoria);
         } else {
-            product.setCategory(null);
+            produto.setCategoria(null);
         }
 
-        if (request.getSupplierId() != null) {
-            Fornecedor supplier = fornecedorRepository.findById(request.getSupplierId())
+        if (request.getFornecedorId() != null) {
+            Fornecedor fornecedor = fornecedorRepository.findById(request.getFornecedorId())
                     .orElseThrow(() -> new RecursoNaoEncontradoException("Fornecedor não encontrado"));
-            product.setSupplier(supplier);
+            produto.setFornecedor(fornecedor);
         } else {
-            product.setSupplier(null);
+            produto.setFornecedor(null);
         }
 
-        produtoRepository.save(product);
-        return mapToResponse(product);
+        produtoRepository.save(produto);
+        return mapToResponse(produto);
     }
 
     @Transactional
@@ -132,32 +132,32 @@ public class ProdutoService {
         produtoRepository.deleteById(id);
     }
 
-    private ProdutoResponse mapToResponse(Produto product) {
+    private ProdutoResponse mapToResponse(Produto produto) {
         ProdutoResponse.ProdutoResponseBuilder builder = ProdutoResponse.builder()
-                .id(product.getId())
-                .name(product.getName())
-                .sku(product.getSku())
-                .description(product.getDescription())
-                .price(product.getPrice())
-                .costPrice(product.getCostPrice())
-                .quantity(product.getQuantity())
-                .minQuantity(product.getMinQuantity())
-                .imageUrl(product.getImageUrl())
-                .lowStock(product.isLowStock())
-                .createdAt(product.getCreatedAt())
-                .updatedAt(product.getUpdatedAt());
+                .id(produto.getId())
+                .nome(produto.getNome())
+                .sku(produto.getSku())
+                .descricao(produto.getDescricao())
+                .preco(produto.getPreco())
+                .precoCusto(produto.getPrecoCusto())
+                .quantidade(produto.getQuantidade())
+                .quantidadeMinima(produto.getQuantidadeMinima())
+                .urlImagem(produto.getUrlImagem())
+                .estoqueAbaixo(produto.isEstoqueAbaixo())
+                .criadoEm(produto.getCriadoEm())
+                .atualizadoEm(produto.getAtualizadoEm());
 
-        if (product.getCategory() != null) {
-            builder.category(CategoriaResponse.builder()
-                    .id(product.getCategory().getId())
-                    .name(product.getCategory().getName())
+        if (produto.getCategoria() != null) {
+            builder.categoria(CategoriaResponse.builder()
+                    .id(produto.getCategoria().getId())
+                    .nome(produto.getCategoria().getNome())
                     .build());
         }
 
-        if (product.getSupplier() != null) {
-            builder.supplier(FornecedorResponse.builder()
-                    .id(product.getSupplier().getId())
-                    .name(product.getSupplier().getName())
+        if (produto.getFornecedor() != null) {
+            builder.fornecedor(FornecedorResponse.builder()
+                    .id(produto.getFornecedor().getId())
+                    .nome(produto.getFornecedor().getNome())
                     .build());
         }
 

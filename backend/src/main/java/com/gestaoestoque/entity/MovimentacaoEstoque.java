@@ -23,27 +23,27 @@ public class MovimentacaoEstoque {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "EMPRESA_ID", nullable = false)
-    private Empresa company;
+    private Empresa empresa;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "PRODUTO_ID", nullable = false)
-    private Produto product;
+    private Produto produto;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USUARIO_ID", nullable = false)
-    private Usuario user;
+    private Usuario usuario;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "TIPO", nullable = false)
-    private TipoMovimentacao type;
+    private TipoMovimentacao tipo;
 
     @Column(name = "QUANTIDADE", nullable = false)
-    private Integer quantity;
+    private Integer quantidade;
 
     @Column(name = "MOTIVO", length = 255)
-    private String reason;
+    private String motivo;
 
     @CreationTimestamp
     @Column(name = "CRIADO_EM", updatable = false)
-    private LocalDateTime createdAt;
+    private LocalDateTime criadoEm;
 }

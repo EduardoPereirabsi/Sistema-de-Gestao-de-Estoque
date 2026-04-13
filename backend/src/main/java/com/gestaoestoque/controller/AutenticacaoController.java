@@ -44,7 +44,7 @@ public class AutenticacaoController {
     @PostMapping("/reset-password")
     @Operation(summary = "Redefinir senha usando token de recuperação")
     public ResponseEntity<Void> resetPassword(@Valid @RequestBody RedefinirSenhaRequest request) {
-        autenticacaoService.resetPassword(request.getToken(), request.getNewPassword());
+        autenticacaoService.resetPassword(request.getToken(), request.getNovaSenha());
         return ResponseEntity.noContent().build();
     }
 }

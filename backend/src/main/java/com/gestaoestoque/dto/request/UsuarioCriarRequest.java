@@ -11,7 +11,7 @@ public class UsuarioCriarRequest {
 
     @NotBlank(message = "Nome é obrigatório")
     @Size(min = 2, max = 100, message = "Nome deve ter entre 2 e 100 caracteres")
-    private String name;
+    private String nome;
 
     @NotBlank(message = "Email é obrigatório")
     @Email(message = "Email inválido")
@@ -19,7 +19,7 @@ public class UsuarioCriarRequest {
 
     @NotBlank(message = "Senha é obrigatória")
     @Size(min = 6, max = 100, message = "Senha deve ter entre 6 e 100 caracteres")
-    private String password;
+    private String senha;
 
-    private Perfil role;
+    private Perfil perfil;
 }

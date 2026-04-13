@@ -16,8 +16,8 @@ public class LoginRequest {
 
     @NotBlank(message = "Senha é obrigatória")
     @Schema(description = "Senha do usuário", example = "senha123")
-    private String password;
+    private String senha;
 
     @Schema(description = "ID da empresa (opcional, para multi-empresa)", example = "1")
-    private Long companyId;
+    private Long empresaId;
 }

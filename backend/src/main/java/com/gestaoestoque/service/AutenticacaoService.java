@@ -35,7 +35,7 @@ public class AutenticacaoService {
         var usuario = usuarioRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RequisicaoInvalidaException("Email ou senha inválidos"));
 
-        if (!passwordEncoder.matches(request.getPassword(), usuario.getSenha())) {
+        if (!passwordEncoder.matches(request.getSenha(), usuario.getSenha())) {
             throw new RequisicaoInvalidaException("Email ou senha inválidos");
         }
 
@@ -43,14 +43,14 @@ public class AutenticacaoService {
             throw new RequisicaoInvalidaException("Usuário inativo. Contate o administrador.");
         }
 
-        if (request.getCompanyId() == null) {
-            List<EmpresaResponse> companies = usuarioRepository.findAllByEmail(request.getEmail())
+        if (request.getEmpresaId() == null) {
+            List<EmpresaResponse> empresas = usuarioRepository.findAllByEmail(request.getEmail())
                     .stream()
                     .map(u -> new EmpresaResponse(u.getEmpresa().getId(), u.getEmpresa().getNome()))
                     .distinct()
                     .toList();
-            if (companies.size() > 1) {
-                return AutenticacaoResponse.builder().companies(companies).build();
+            if (empresas.size() > 1) {
+                return AutenticacaoResponse.builder().empresas(empresas).build();
             }
         }
 
@@ -64,16 +64,16 @@ public class AutenticacaoService {
         }
 
         Empresa empresa = Empresa.builder()
-                .nome(request.getCompanyName() != null ? request.getCompanyName() : request.getName() + " Empresa")
+                .nome(request.getNomeEmpresa() != null ? request.getNomeEmpresa() : request.getNome() + " Empresa")
                 .cnpj("00.000.000/0000-00")
                 .ativo(true)
                 .build();
         empresa = empresaRepository.save(empresa);
 
         Usuario usuario = Usuario.builder()
-                .nome(request.getName())
+                .nome(request.getNome())
                 .email(request.getEmail())
-                .senha(passwordEncoder.encode(request.getPassword()))
+                .senha(passwordEncoder.encode(request.getSenha()))
                 .perfil(Perfil.ADMIN)
                 .ativo(true)
                 .empresa(empresa)
@@ -116,20 +116,20 @@ public class AutenticacaoService {
         String accessToken = tokenProvider.generateAccessToken(usuario.getId());
         String refreshToken = tokenProvider.generateRefreshToken(usuario.getId());
 
-        UsuarioResponse userResponse = UsuarioResponse.builder()
+        UsuarioResponse usuarioResponse = UsuarioResponse.builder()
                 .id(usuario.getId())
-                .name(usuario.getNome())
+                .nome(usuario.getNome())
                 .email(usuario.getEmail())
-                .role(usuario.getPerfil())
-                .active(usuario.getAtivo())
-                .companyName(usuario.getEmpresa().getNome())
-                .createdAt(usuario.getCriadoEm())
+                .perfil(usuario.getPerfil())
+                .ativo(usuario.getAtivo())
+                .nomeEmpresa(usuario.getEmpresa().getNome())
+                .criadoEm(usuario.getCriadoEm())
                 .build();
 
         return AutenticacaoResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
-                .user(userResponse)
+                .usuario(usuarioResponse)
                 .build();
     }
 }

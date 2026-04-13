@@ -10,7 +10,7 @@ public class FornecedorRequest {
 
     @NotBlank(message = "Nome do fornecedor é obrigatório")
     @Size(max = 150, message = "Nome deve ter no máximo 150 caracteres")
-    private String name;
+    private String nome;
 
     @Size(max = 18, message = "CNPJ deve ter no máximo 18 caracteres")
     private String cnpj;
@@ -19,7 +19,7 @@ public class FornecedorRequest {
     private String email;
 
     @Size(max = 20)
-    private String phone;
+    private String telefone;
 
-    private String address;
+    private String endereco;
 }

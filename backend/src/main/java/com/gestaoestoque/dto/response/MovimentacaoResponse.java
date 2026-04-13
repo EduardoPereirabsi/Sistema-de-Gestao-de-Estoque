@@ -12,11 +12,11 @@ import java.time.LocalDateTime;
 @Schema(description = "Dados de uma movimentação de estoque")
 public class MovimentacaoResponse {
     private Long id;
-    private String productName;
-    private String productSku;
-    private String userName;
-    private TipoMovimentacao type;
-    private Integer quantity;
-    private String reason;
-    private LocalDateTime createdAt;
+    private String nomeProduto;
+    private String skuProduto;
+    private String nomeUsuario;
+    private TipoMovimentacao tipo;
+    private Integer quantidade;
+    private String motivo;
+    private LocalDateTime criadoEm;
 }

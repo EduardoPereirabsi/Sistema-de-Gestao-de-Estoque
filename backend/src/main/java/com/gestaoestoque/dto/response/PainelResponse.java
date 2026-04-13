@@ -10,10 +10,10 @@ import java.math.BigDecimal;
 @Builder
 @Schema(description = "Resumo do painel/dashboard")
 public class PainelResponse {
-    private Long totalProducts;
-    private Long totalCategories;
-    private Long totalSuppliers;
-    private BigDecimal totalStockValue;
-    private Long lowStockCount;
-    private Long movementsThisMonth;
+    private Long totalProdutos;
+    private Long totalCategorias;
+    private Long totalFornecedores;
+    private BigDecimal valorTotalEstoque;
+    private Long produtosAbaixoMinimo;
+    private Long movimentacoesMes;
 }

@@ -9,15 +9,15 @@ import lombok.Data;
 public class UsuarioAtualizarRequest {
 
     @Size(min = 2, max = 100, message = "Nome deve ter entre 2 e 100 caracteres")
-    private String name;
+    private String nome;
 
     @Email(message = "Email inválido")
     private String email;
 
     @Size(min = 6, max = 100, message = "Senha deve ter entre 6 e 100 caracteres")
-    private String password;
+    private String senha;
 
-    private Perfil role;
+    private Perfil perfil;
 
-    private Boolean active;
+    private Boolean ativo;
 }

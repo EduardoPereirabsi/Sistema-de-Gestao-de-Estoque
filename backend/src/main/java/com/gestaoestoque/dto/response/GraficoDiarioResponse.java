@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Schema(description = "Dados diários de movimentações para gráfico")
 public class GraficoDiarioResponse {
-    private String date;
-    private Long entries;
-    private Long exits;
-    private Long adjustments;
+    private String data;
+    private Long entradas;
+    private Long saidas;
+    private Long ajustes;
 }

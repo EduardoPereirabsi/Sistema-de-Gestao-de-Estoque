@@ -29,6 +29,9 @@ public class Fornecedor {
     @Column(length = 20)
     private String telefone;
 
+    @Column(length = 255)
+    private String endereco;
+
     @Column(nullable = false)
     private Boolean ativo = true;
 

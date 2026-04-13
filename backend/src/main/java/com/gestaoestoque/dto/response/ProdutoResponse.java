@@ -15,34 +15,34 @@ public class ProdutoResponse {
     private Long id;
 
     @Schema(description = "Nome do produto", example = "Notebook Dell Inspiron 15")
-    private String name;
+    private String nome;
 
     @Schema(description = "Código SKU único", example = "NOTE-DELL-001")
     private String sku;
 
     @Schema(description = "Descrição do produto", example = "Notebook com 16GB RAM, SSD 512GB")
-    private String description;
+    private String descricao;
 
     @Schema(description = "Preço de venda", example = "4599.90")
-    private BigDecimal price;
+    private BigDecimal preco;
 
     @Schema(description = "Preço de custo", example = "3200.00")
-    private BigDecimal costPrice;
+    private BigDecimal precoCusto;
 
     @Schema(description = "Quantidade atual em estoque", example = "50")
-    private Integer quantity;
+    private Integer quantidade;
 
     @Schema(description = "Quantidade mínima (alerta estoque baixo)", example = "10")
-    private Integer minQuantity;
+    private Integer quantidadeMinima;
 
     @Schema(description = "URL da imagem do produto")
-    private String imageUrl;
+    private String urlImagem;
 
     @Schema(description = "Indica se o estoque está abaixo do mínimo", example = "false")
-    private boolean lowStock;
+    private boolean estoqueAbaixo;
 
-    private CategoriaResponse category;
-    private FornecedorResponse supplier;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private CategoriaResponse categoria;
+    private FornecedorResponse fornecedor;
+    private LocalDateTime criadoEm;
+    private LocalDateTime atualizadoEm;
 }

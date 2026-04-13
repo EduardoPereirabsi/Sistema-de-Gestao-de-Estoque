@@ -21,6 +21,6 @@ public class EmpresaContexto {
     }
 
     public Long getCurrentCompanyId() {
-        return getCurrentUser().getCompany().getId();
+        return getCurrentUser().getEmpresa().getId();
     }
 }

@@ -9,10 +9,10 @@ import java.time.LocalDateTime;
 @Builder
 public class FornecedorResponse {
     private Long id;
-    private String name;
+    private String nome;
     private String cnpj;
     private String email;
-    private String phone;
-    private String address;
-    private LocalDateTime createdAt;
+    private String telefone;
+    private String endereco;
+    private LocalDateTime criadoEm;
 }

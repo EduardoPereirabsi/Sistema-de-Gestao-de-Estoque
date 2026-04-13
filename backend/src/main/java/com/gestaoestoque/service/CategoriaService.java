@@ -21,52 +21,52 @@ public class CategoriaService {
     private final EmpresaContexto empresaContexto;
 
     public List<CategoriaResponse> findAll() {
-        Long companyId = empresaContexto.getCurrentCompanyId();
-        return categoriaRepository.findByCompanyId(companyId).stream()
+        Long empresaId = empresaContexto.getCurrentCompanyId();
+        return categoriaRepository.findByEmpresaId(empresaId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     public CategoriaResponse findById(Long id) {
-        Categoria category = categoriaRepository.findById(id)
+        Categoria categoria = categoriaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Categoria não encontrada com ID: " + id));
-        return mapToResponse(category);
+        return mapToResponse(categoria);
     }
 
     @Transactional
     public CategoriaResponse create(CategoriaRequest request) {
-        Long companyId = empresaContexto.getCurrentCompanyId();
-        if (categoriaRepository.existsByNameAndCompanyId(request.getName(), companyId)) {
-            throw new RecursoDuplicadoException("Categoria já existe: " + request.getName());
+        Long empresaId = empresaContexto.getCurrentCompanyId();
+        if (categoriaRepository.existsByNomeAndEmpresaId(request.getNome(), empresaId)) {
+            throw new RecursoDuplicadoException("Categoria já existe: " + request.getNome());
         }
 
-        Categoria category = Categoria.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .company(empresaContexto.getCurrentUser().getCompany())
+        Categoria categoria = Categoria.builder()
+                .nome(request.getNome())
+                .descricao(request.getDescricao())
+                .empresa(empresaContexto.getCurrentUser().getEmpresa())
                 .build();
 
-        categoriaRepository.save(category);
-        return mapToResponse(category);
+        categoriaRepository.save(categoria);
+        return mapToResponse(categoria);
     }
 
     @Transactional
     public CategoriaResponse update(Long id, CategoriaRequest request) {
-        Categoria category = categoriaRepository.findById(id)
+        Categoria categoria = categoriaRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Categoria não encontrada com ID: " + id));
 
-        Long companyId = empresaContexto.getCurrentCompanyId();
-        categoriaRepository.findByNameAndCompanyId(request.getName(), companyId)
+        Long empresaId = empresaContexto.getCurrentCompanyId();
+        categoriaRepository.findByNomeAndEmpresaId(request.getNome(), empresaId)
                 .ifPresent(existing -> {
                     if (!existing.getId().equals(id)) {
-                        throw new RecursoDuplicadoException("Categoria já existe: " + request.getName());
+                        throw new RecursoDuplicadoException("Categoria já existe: " + request.getNome());
                     }
                 });
 
-        category.setName(request.getName());
-        category.setDescription(request.getDescription());
-        categoriaRepository.save(category);
-        return mapToResponse(category);
+        categoria.setNome(request.getNome());
+        categoria.setDescricao(request.getDescricao());
+        categoriaRepository.save(categoria);
+        return mapToResponse(categoria);
     }
 
     @Transactional
@@ -77,12 +77,12 @@ public class CategoriaService {
         categoriaRepository.deleteById(id);
     }
 
-    private CategoriaResponse mapToResponse(Categoria category) {
+    private CategoriaResponse mapToResponse(Categoria categoria) {
         return CategoriaResponse.builder()
-                .id(category.getId())
-                .name(category.getName())
-                .description(category.getDescription())
-                .createdAt(category.getCreatedAt())
+                .id(categoria.getId())
+                .nome(categoria.getNome())
+                .descricao(categoria.getDescricao())
+                .criadoEm(categoria.getCriadoEm())
                 .build();
     }
 }

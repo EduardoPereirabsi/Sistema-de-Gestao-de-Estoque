@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Builder
 public class CategoriaResponse {
     private Long id;
-    private String name;
-    private String description;
-    private LocalDateTime createdAt;
+    private String nome;
+    private String descricao;
+    private LocalDateTime criadoEm;
 }

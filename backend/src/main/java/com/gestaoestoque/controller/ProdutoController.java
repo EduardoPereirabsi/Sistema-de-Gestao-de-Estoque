@@ -39,9 +39,9 @@ public class ProdutoController {
     @GetMapping("/search")
     @Operation(summary = "Buscar por nome", description = "Busca produtos pelo nome")
     public ResponseEntity<Page<ProdutoResponse>> search(
-            @RequestParam String name,
+            @RequestParam String nome,
             @PageableDefault(size = 20) Pageable pageable) {
-        return ResponseEntity.ok(produtoService.search(name, pageable));
+        return ResponseEntity.ok(produtoService.search(nome, pageable));
     }
 
     @GetMapping("/low-stock")

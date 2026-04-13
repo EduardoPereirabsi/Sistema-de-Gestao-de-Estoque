@@ -19,35 +19,35 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
     boolean existsBySku(String sku);
 
-    Page<Produto> findByCategoryId(Long categoryId, Pageable pageable);
+    Page<Produto> findByCategoriaId(Long categoriaId, Pageable pageable);
 
-    Page<Produto> findBySupplierId(Long supplierId, Pageable pageable);
+    Page<Produto> findByFornecedorId(Long fornecedorId, Pageable pageable);
 
-    @Query("SELECT p FROM Produto p WHERE p.quantity <= p.minQuantity")
+    @Query("SELECT p FROM Produto p WHERE p.quantidade <= p.quantidadeMinima")
     List<Produto> findLowStockProducts();
 
-    Page<Produto> findByNameContainingIgnoreCase(String name, Pageable pageable);
+    Page<Produto> findByNomeContainingIgnoreCase(String nome, Pageable pageable);
 
-    @Query("SELECT COALESCE(SUM(p.quantity * p.price), 0) FROM Produto p")
+    @Query("SELECT COALESCE(SUM(p.quantidade * p.preco), 0) FROM Produto p")
     BigDecimal calculateTotalStockValue();
 
-    @Query("SELECT COUNT(p) FROM Produto p WHERE p.quantity <= p.minQuantity")
+    @Query("SELECT COUNT(p) FROM Produto p WHERE p.quantidade <= p.quantidadeMinima")
     Long countLowStockProducts();
 
-    Page<Produto> findByCompanyId(Long companyId, Pageable pageable);
+    Page<Produto> findByEmpresaId(Long empresaId, Pageable pageable);
 
-    Page<Produto> findByNameContainingIgnoreCaseAndCompanyId(String name, Long companyId, Pageable pageable);
+    Page<Produto> findByNomeContainingIgnoreCaseAndEmpresaId(String nome, Long empresaId, Pageable pageable);
 
-    @Query("SELECT p FROM Produto p WHERE p.quantity <= p.minQuantity AND p.company.id = :companyId")
-    List<Produto> findLowStockProductsByCompanyId(@Param("companyId") Long companyId);
+    @Query("SELECT p FROM Produto p WHERE p.quantidade <= p.quantidadeMinima AND p.empresa.id = :empresaId")
+    List<Produto> findLowStockProductsByEmpresaId(@Param("empresaId") Long empresaId);
 
-    boolean existsBySkuAndCompanyId(String sku, Long companyId);
+    boolean existsBySkuAndEmpresaId(String sku, Long empresaId);
 
-    @Query("SELECT COALESCE(SUM(p.quantity * p.price), 0) FROM Produto p WHERE p.company.id = :companyId")
-    BigDecimal calculateTotalStockValueByCompanyId(@Param("companyId") Long companyId);
+    @Query("SELECT COALESCE(SUM(p.quantidade * p.preco), 0) FROM Produto p WHERE p.empresa.id = :empresaId")
+    BigDecimal calculateTotalStockValueByEmpresaId(@Param("empresaId") Long empresaId);
 
-    @Query("SELECT COUNT(p) FROM Produto p WHERE p.quantity <= p.minQuantity AND p.company.id = :companyId")
-    Long countLowStockProductsByCompanyId(@Param("companyId") Long companyId);
+    @Query("SELECT COUNT(p) FROM Produto p WHERE p.quantidade <= p.quantidadeMinima AND p.empresa.id = :empresaId")
+    Long countLowStockProductsByEmpresaId(@Param("empresaId") Long empresaId);
 
-    long countByCompanyId(Long companyId);
+    long countByEmpresaId(Long empresaId);
 }

@@ -21,57 +21,57 @@ public class FornecedorService {
     private final EmpresaContexto empresaContexto;
 
     public List<FornecedorResponse> findAll() {
-        Long companyId = empresaContexto.getCurrentCompanyId();
-        return fornecedorRepository.findByCompanyId(companyId).stream()
+        Long empresaId = empresaContexto.getCurrentCompanyId();
+        return fornecedorRepository.findByEmpresaId(empresaId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     public FornecedorResponse findById(Long id) {
-        Fornecedor supplier = fornecedorRepository.findById(id)
+        Fornecedor fornecedor = fornecedorRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Fornecedor não encontrado com ID: " + id));
-        return mapToResponse(supplier);
+        return mapToResponse(fornecedor);
     }
 
     @Transactional
     public FornecedorResponse create(FornecedorRequest request) {
-        Long companyId = empresaContexto.getCurrentCompanyId();
-        if (request.getCnpj() != null && fornecedorRepository.existsByCnpjAndCompanyId(request.getCnpj(), companyId)) {
+        Long empresaId = empresaContexto.getCurrentCompanyId();
+        if (request.getCnpj() != null && fornecedorRepository.existsByCnpjAndEmpresaId(request.getCnpj(), empresaId)) {
             throw new RecursoDuplicadoException("CNPJ já cadastrado: " + request.getCnpj());
         }
 
-        Fornecedor supplier = Fornecedor.builder()
-                .name(request.getName())
+        Fornecedor fornecedor = Fornecedor.builder()
+                .nome(request.getNome())
                 .cnpj(request.getCnpj())
                 .email(request.getEmail())
-                .phone(request.getPhone())
-                .address(request.getAddress())
-                .company(empresaContexto.getCurrentUser().getCompany())
+                .telefone(request.getTelefone())
+                .endereco(request.getEndereco())
+                .empresa(empresaContexto.getCurrentUser().getEmpresa())
                 .build();
 
-        fornecedorRepository.save(supplier);
-        return mapToResponse(supplier);
+        fornecedorRepository.save(fornecedor);
+        return mapToResponse(fornecedor);
     }
 
     @Transactional
     public FornecedorResponse update(Long id, FornecedorRequest request) {
-        Fornecedor supplier = fornecedorRepository.findById(id)
+        Fornecedor fornecedor = fornecedorRepository.findById(id)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Fornecedor não encontrado com ID: " + id));
 
-        Long companyId = empresaContexto.getCurrentCompanyId();
-        if (request.getCnpj() != null && !request.getCnpj().equals(supplier.getCnpj())) {
-            if (fornecedorRepository.existsByCnpjAndCompanyId(request.getCnpj(), companyId)) {
+        Long empresaId = empresaContexto.getCurrentCompanyId();
+        if (request.getCnpj() != null && !request.getCnpj().equals(fornecedor.getCnpj())) {
+            if (fornecedorRepository.existsByCnpjAndEmpresaId(request.getCnpj(), empresaId)) {
                 throw new RecursoDuplicadoException("CNPJ já cadastrado: " + request.getCnpj());
             }
         }
 
-        supplier.setName(request.getName());
-        supplier.setCnpj(request.getCnpj());
-        supplier.setEmail(request.getEmail());
-        supplier.setPhone(request.getPhone());
-        supplier.setAddress(request.getAddress());
-        fornecedorRepository.save(supplier);
-        return mapToResponse(supplier);
+        fornecedor.setNome(request.getNome());
+        fornecedor.setCnpj(request.getCnpj());
+        fornecedor.setEmail(request.getEmail());
+        fornecedor.setTelefone(request.getTelefone());
+        fornecedor.setEndereco(request.getEndereco());
+        fornecedorRepository.save(fornecedor);
+        return mapToResponse(fornecedor);
     }
 
     @Transactional
@@ -82,14 +82,15 @@ public class FornecedorService {
         fornecedorRepository.deleteById(id);
     }
 
-    private FornecedorResponse mapToResponse(Fornecedor supplier) {
+    private FornecedorResponse mapToResponse(Fornecedor fornecedor) {
         return FornecedorResponse.builder()
-                .id(supplier.getId())
-                .name(supplier.getName())
-                .cnpj(supplier.getCnpj())
-                .email(supplier.getEmail())
-                .phone(supplier.getPhone())
-                .address(supplier.getAddress())
-                .createdAt(supplier.getCreatedAt())
+                .id(fornecedor.getId())
+                .nome(fornecedor.getNome())
+                .cnpj(fornecedor.getCnpj())
+                .email(fornecedor.getEmail())
+                .telefone(fornecedor.getTelefone())
+                .endereco(fornecedor.getEndereco())
+                .criadoEm(fornecedor.getCriadoEm())
                 .build();
     }
+}

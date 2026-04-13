@@ -10,10 +10,10 @@ import java.time.LocalDateTime;
 @Builder
 public class UsuarioResponse {
     private Long id;
-    private String name;
+    private String nome;
     private String email;
-    private Perfil role;
-    private Boolean active;
-    private String companyName;
-    private LocalDateTime createdAt;
+    private Perfil perfil;
+    private Boolean ativo;
+    private String nomeEmpresa;
+    private LocalDateTime criadoEm;
 }

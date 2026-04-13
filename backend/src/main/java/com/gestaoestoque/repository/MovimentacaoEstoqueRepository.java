@@ -14,31 +14,31 @@ import java.time.LocalDateTime;
 @Repository
 public interface MovimentacaoEstoqueRepository extends JpaRepository<MovimentacaoEstoque, Long> {
 
-    Page<MovimentacaoEstoque> findByProductId(Long productId, Pageable pageable);
+    Page<MovimentacaoEstoque> findByProdutoId(Long produtoId, Pageable pageable);
 
-    Page<MovimentacaoEstoque> findByType(TipoMovimentacao type, Pageable pageable);
+    Page<MovimentacaoEstoque> findByTipo(TipoMovimentacao tipo, Pageable pageable);
 
-    @Query("SELECT sm FROM MovimentacaoEstoque sm WHERE sm.createdAt BETWEEN :start AND :end")
+    @Query("SELECT sm FROM MovimentacaoEstoque sm WHERE sm.criadoEm BETWEEN :start AND :end")
     Page<MovimentacaoEstoque> findByDateRange(
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
             Pageable pageable
     );
 
-    @Query("SELECT COUNT(sm) FROM MovimentacaoEstoque sm WHERE MONTH(sm.createdAt) = MONTH(CURRENT_DATE) AND YEAR(sm.createdAt) = YEAR(CURRENT_DATE)")
+    @Query("SELECT COUNT(sm) FROM MovimentacaoEstoque sm WHERE MONTH(sm.criadoEm) = MONTH(CURRENT_DATE) AND YEAR(sm.criadoEm) = YEAR(CURRENT_DATE)")
     Long countMovementsThisMonth();
 
-    Page<MovimentacaoEstoque> findByCompanyId(Long companyId, Pageable pageable);
+    Page<MovimentacaoEstoque> findByEmpresaId(Long empresaId, Pageable pageable);
 
-    @Query("SELECT COUNT(sm) FROM MovimentacaoEstoque sm WHERE MONTH(sm.createdAt) = MONTH(CURRENT_DATE) AND YEAR(sm.createdAt) = YEAR(CURRENT_DATE)AND sm.company.id = :companyId")
-    Long countMovementsThisMonthByCompanyId(@Param("companyId") Long companyId);
+    @Query("SELECT COUNT(sm) FROM MovimentacaoEstoque sm WHERE MONTH(sm.criadoEm) = MONTH(CURRENT_DATE) AND YEAR(sm.criadoEm) = YEAR(CURRENT_DATE) AND sm.empresa.id = :empresaId")
+    Long countMovementsThisMonthByEmpresaId(@Param("empresaId") Long empresaId);
 
-    @Query("SELECT sm.type, CAST(sm.createdAt AS LocalDate), COUNT(sm) FROM MovimentacaoEstoque sm " +
-            "WHERE sm.company.id = :companyId AND sm.createdAt >= :startDate " +
-            "GROUP BY sm.type, CAST(sm.createdAt AS LocalDate) " +
-            "ORDER BY CAST(sm.createdAt AS LocalDate)")
-    java.util.List<Object[]> countByTypeAndDateGrouped(
-            @Param("companyId") Long companyId,
+    @Query("SELECT sm.tipo, CAST(sm.criadoEm AS LocalDate), COUNT(sm) FROM MovimentacaoEstoque sm " +
+            "WHERE sm.empresa.id = :empresaId AND sm.criadoEm >= :startDate " +
+            "GROUP BY sm.tipo, CAST(sm.criadoEm AS LocalDate) " +
+            "ORDER BY CAST(sm.criadoEm AS LocalDate)")
+    java.util.List<Object[]> countByTipoAndDataGrouped(
+            @Param("empresaId") Long empresaId,
             @Param("startDate") LocalDateTime startDate
     );
 }
