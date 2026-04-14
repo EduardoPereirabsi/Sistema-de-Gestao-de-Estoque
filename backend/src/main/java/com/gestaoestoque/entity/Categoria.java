@@ -23,6 +23,7 @@ public class Categoria {
     @Column(length = 255)
     private String descricao;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean ativo = true;
 

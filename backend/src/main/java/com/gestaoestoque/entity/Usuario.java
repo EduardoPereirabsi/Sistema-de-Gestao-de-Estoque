@@ -33,10 +33,12 @@ public class Usuario {
     @Column(name = "senha", nullable = false, length = 255)
     private String senha;
 
+    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(name = "perfil", nullable = false, length = 20)
     private Perfil perfil = Perfil.OPERADOR;
 
+    @Builder.Default
     @Column(name = "ativo", nullable = false)
     private Boolean ativo = true;
 

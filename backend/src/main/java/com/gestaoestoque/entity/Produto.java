@@ -31,15 +31,19 @@ public class Produto {
     @Column(name = "DESCRICAO", columnDefinition = "TEXT")
     private String descricao;
 
+    @Builder.Default
     @Column(name = "PRECO", nullable = false, precision = 12, scale = 2)
     private BigDecimal preco = BigDecimal.ZERO;
 
+    @Builder.Default
     @Column(name = "PRECO_CUSTO", nullable = false, precision = 12, scale = 2)
     private BigDecimal precoCusto = BigDecimal.ZERO;
 
+    @Builder.Default
     @Column(name = "QUANTIDADE", nullable = false)
     private Integer quantidade = 0;
 
+    @Builder.Default
     @Column(name = "QUANTIDADE_MINIMA", nullable = false)
     private Integer quantidadeMinima = 0;
 

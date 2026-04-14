@@ -32,6 +32,7 @@ public class Fornecedor {
     @Column(length = 255)
     private String endereco;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean ativo = true;
 

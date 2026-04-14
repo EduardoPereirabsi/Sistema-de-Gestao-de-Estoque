@@ -30,6 +30,7 @@ public class Empresa {
     @Column(length = 20)
     private String telefone;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean ativo = true;
 
