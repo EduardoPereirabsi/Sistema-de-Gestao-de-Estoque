@@ -1,5 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import LoginPage from './pages/LoginPage';
+import CadastroPage from './pages/CadastroPage';
 import Layout from './components/layout/Layout';
 import PainelPage from './pages/PainelPage';
 import ProdutosPage from './pages/ProdutosPage';
@@ -14,10 +16,18 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   return token ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
-function App() {
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { isAdmin, autenticado } = useAuth();
+  if (!autenticado) return <Navigate to="/login" replace />;
+  if (!isAdmin) return <Navigate to="/painel" replace />;
+  return <>{children}</>;
+}
+
+function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/cadastro" element={<CadastroPage />} />
       <Route
         path="/"
         element={
@@ -33,10 +43,18 @@ function App() {
         <Route path="fornecedores" element={<FornecedoresPage />} />
         <Route path="estoque" element={<EstoquePage />} />
         <Route path="movimentacoes" element={<MovimentacoesPage />} />
-        <Route path="usuarios" element={<UsuariosPage />} />
+        <Route path="usuarios" element={<AdminRoute><UsuariosPage /></AdminRoute>} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
   );
 }
 
