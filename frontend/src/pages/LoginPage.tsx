@@ -36,6 +36,9 @@ export default function LoginPage() {
       if (resposta.data.refreshToken) {
         localStorage.setItem('refreshToken', resposta.data.refreshToken);
       }
+      if (resposta.data.usuario) {
+        localStorage.setItem('user', JSON.stringify(resposta.data.usuario));
+      }
       navigate('/painel');
     } catch {
       setErro('E-mail ou senha inválidos.');
