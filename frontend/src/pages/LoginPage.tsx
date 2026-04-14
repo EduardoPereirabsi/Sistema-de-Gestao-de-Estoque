@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Package, Eye, EyeOff, LogIn } from 'lucide-react';
-import api from '../services/api';
+import { api } from '../services/api';
 
 const loginSchema = z.object({
   email: z.string().email('E-mail inválido'),
@@ -32,7 +32,10 @@ export default function LoginPage() {
     setCarregando(true);
     try {
       const resposta = await api.post('/auth/login', dados);
-      localStorage.setItem('token', resposta.data.token);
+      localStorage.setItem('accessToken', resposta.data.accessToken);
+      if (resposta.data.refreshToken) {
+        localStorage.setItem('refreshToken', resposta.data.refreshToken);
+      }
       navigate('/painel');
     } catch {
       setErro('E-mail ou senha inválidos.');
