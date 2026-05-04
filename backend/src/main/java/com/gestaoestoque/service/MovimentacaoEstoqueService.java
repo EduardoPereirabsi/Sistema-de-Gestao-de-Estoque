@@ -61,6 +61,20 @@ public class MovimentacaoEstoqueService {
         }
 
         produtoRepository.save(produto);
+        produtoRepository.save(produto);
+        movimentacaoRepository.save(movimentacao);
+        if (produto.isEstoqueAbaixo()) {
+            messagingTemplate.convertAndSend(
+                    "/topic/low-stock",
+                    "Produto '" + produto.getNome() + "' está com estoque baixo: "
+                            + produto.getQuantidade() + " unidade(s)"
+            );
+        }
+        return mapToResponse(movimentacao);
+    }
+}
+
+
 
         MovimentacaoEstoque movimentacao = MovimentacaoEstoque.builder()
                 .empresa(usuario.getEmpresa())
