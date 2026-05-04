@@ -84,3 +84,11 @@ export interface GraficoDiario {
   saidas: number;
   ajustes: number;
 }
+
+export interface PageResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+}
