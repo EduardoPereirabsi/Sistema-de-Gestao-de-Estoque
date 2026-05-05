@@ -12,6 +12,7 @@ import com.gestaoestoque.repository.ProdutoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ public class MovimentacaoEstoqueService {
     private final MovimentacaoEstoqueRepository movimentacaoRepository;
     private final ProdutoRepository produtoRepository;
     private final EmpresaContexto empresaContexto;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public Page<MovimentacaoResponse> findAll(Pageable pageable) {
         Long empresaId = empresaContexto.getCurrentCompanyId();
@@ -61,20 +63,6 @@ public class MovimentacaoEstoqueService {
         }
 
         produtoRepository.save(produto);
-        produtoRepository.save(produto);
-        movimentacaoRepository.save(movimentacao);
-        if (produto.isEstoqueAbaixo()) {
-            messagingTemplate.convertAndSend(
-                    "/topic/low-stock",
-                    "Produto '" + produto.getNome() + "' está com estoque baixo: "
-                            + produto.getQuantidade() + " unidade(s)"
-            );
-        }
-        return mapToResponse(movimentacao);
-    }
-}
-
-
 
         MovimentacaoEstoque movimentacao = MovimentacaoEstoque.builder()
                 .empresa(usuario.getEmpresa())
@@ -85,7 +73,15 @@ public class MovimentacaoEstoqueService {
                 .motivo(request.getMotivo())
                 .build();
 
-        movimentacaoRepository.save(movimentacao);
+        movimentacao = movimentacaoRepository.save(movimentacao);
+
+        if (produto.isEstoqueAbaixo()) {
+            messagingTemplate.convertAndSend(
+                    "/topic/low-stock",
+                    "Produto '" + produto.getNome() + "' está com estoque baixo: "
+                            + produto.getQuantidade() + " unidade(s)"
+            );
+        }
         return mapToResponse(movimentacao);
     }
 

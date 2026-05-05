@@ -23,6 +23,7 @@ export default function CadastroPage() {
   const navigate = useNavigate();
   const { cadastrar } = useAuth();
   const [mostrarSenha, setMostrarSenha] = useState(false);
+  const [mostrarConfirmarSenha, setMostrarConfirmarSenha] = useState(false);
   const [erro, setErro] = useState('');
   const [carregando, setCarregando] = useState(false);
 
@@ -114,12 +115,21 @@ export default function CadastroPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Confirmar Senha</label>
-            <input
-              {...register('confirmarSenha')}
-              type="password"
-              autoComplete="new-password"
-              className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            <div className="relative">
+              <input
+                {...register('confirmarSenha')}
+                type={mostrarConfirmarSenha ? 'text' : 'password'}
+                autoComplete="new-password"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setMostrarConfirmarSenha(!mostrarConfirmarSenha)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                {mostrarConfirmarSenha ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
             {errors.confirmarSenha && <p className="text-red-500 text-xs mt-1">{errors.confirmarSenha.message}</p>}
           </div>
 
