@@ -40,7 +40,7 @@ export default function CadastroPage() {
     setCarregando(true);
     try {
       await cadastrar(dados.nome, dados.email, dados.senha, dados.nomeEmpresa);
-      navigate('/painel');
+      navigate('/login', { replace: true });
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
       setErro(msg ?? 'Erro ao criar conta. Verifique os dados e tente novamente.');

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,6 +24,7 @@ public class MovimentacaoEstoqueController {
     private final MovimentacaoEstoqueService movimentacaoEstoqueService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE','OPERADOR')")
     @Operation(summary = "Listar movimentações", description = "Retorna movimentações paginadas da empresa atual")
     public ResponseEntity<Page<MovimentacaoResponse>> findAll(
             @PageableDefault(size = 20) Pageable pageable) {
@@ -30,6 +32,7 @@ public class MovimentacaoEstoqueController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE','OPERADOR')")
     @Operation(summary = "Registrar movimentação", description = "Registra entrada, saída ou ajuste de estoque")
     public ResponseEntity<MovimentacaoResponse> create(
             @Valid @RequestBody MovimentacaoRequest request) {

@@ -5,13 +5,15 @@ interface UsuarioLogado {
   id: number;
   nome: string;
   email: string;
-  perfil: 'ADMIN' | 'OPERADOR';
+  perfil: 'ADMIN' | 'GERENTE' | 'OPERADOR';
   nomeEmpresa: string;
 }
 
 interface AuthContextData {
   usuario: UsuarioLogado | null;
   isAdmin: boolean;
+  isGerente: boolean;
+  isAdminOrGerente: boolean;
   autenticado: boolean;
   login: (email: string, senha: string) => Promise<void>;
   cadastrar: (nome: string, email: string, senha: string, nomeEmpresa: string) => Promise<void>;
@@ -31,6 +33,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (raw) setUsuario(JSON.parse(raw));
   }, []);
 
+  const limparSessao = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+    setUsuario(null);
+  };
+
   const salvarSessao = (data: { accessToken: string; refreshToken?: string; usuario: UsuarioLogado }) => {
     localStorage.setItem('accessToken', data.accessToken);
     if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
@@ -44,21 +53,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const cadastrar = async (nome: string, email: string, senha: string, nomeEmpresa: string) => {
-    const { data } = await api.post('/api/auth/register', { nome, email, senha, nomeEmpresa });
-    salvarSessao(data);
+    await api.post('/api/auth/register', { nome, email, senha, nomeEmpresa });
+    limparSessao();
   };
 
   const logout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('user');
-    setUsuario(null);
+    limparSessao();
   };
 
   return (
     <AuthContext.Provider value={{
       usuario,
       isAdmin: usuario?.perfil === 'ADMIN',
+      isGerente: usuario?.perfil === 'GERENTE',
+      isAdminOrGerente: usuario?.perfil === 'ADMIN' || usuario?.perfil === 'GERENTE',
       autenticado: !!usuario,
       login,
       cadastrar,

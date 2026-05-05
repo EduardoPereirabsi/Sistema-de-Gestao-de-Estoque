@@ -11,19 +11,32 @@ import EstoquePage from './pages/EstoquePage';
 import MovimentacoesPage from './pages/MovimentacoesPage';
 import UsuariosPage from './pages/UsuariosPage';
 
+function getHomePath(perfil?: 'ADMIN' | 'GERENTE' | 'OPERADOR') {
+  return perfil === 'OPERADOR' ? '/estoque' : '/painel';
+}
+
 function PrivateRoute({ children }: { children: React.ReactNode }) {
-  const token = localStorage.getItem('accessToken');
-  return token ? <>{children}</> : <Navigate to="/login" replace />;
+  const { autenticado } = useAuth();
+  return autenticado ? <>{children}</> : <Navigate to="/login" replace />;
+}
+
+function ManagerRoute({ children }: { children: React.ReactNode }) {
+  const { usuario, isAdminOrGerente, autenticado } = useAuth();
+  if (!autenticado) return <Navigate to="/login" replace />;
+  if (!isAdminOrGerente) return <Navigate to={getHomePath(usuario?.perfil)} replace />;
+  return <>{children}</>;
 }
 
 function AdminRoute({ children }: { children: React.ReactNode }) {
-  const { isAdmin, autenticado } = useAuth();
+  const { usuario, isAdmin, autenticado } = useAuth();
   if (!autenticado) return <Navigate to="/login" replace />;
-  if (!isAdmin) return <Navigate to="/painel" replace />;
+  if (!isAdmin) return <Navigate to={getHomePath(usuario?.perfil)} replace />;
   return <>{children}</>;
 }
 
 function AppRoutes() {
+  const { usuario } = useAuth();
+
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
@@ -36,11 +49,11 @@ function AppRoutes() {
           </PrivateRoute>
         }
       >
-        <Route index element={<Navigate to="/painel" replace />} />
-        <Route path="painel" element={<PainelPage />} />
-        <Route path="produtos" element={<ProdutosPage />} />
-        <Route path="categorias" element={<CategoriasPage />} />
-        <Route path="fornecedores" element={<FornecedoresPage />} />
+        <Route index element={<Navigate to={getHomePath(usuario?.perfil)} replace />} />
+        <Route path="painel" element={<ManagerRoute><PainelPage /></ManagerRoute>} />
+        <Route path="produtos" element={<ManagerRoute><ProdutosPage /></ManagerRoute>} />
+        <Route path="categorias" element={<ManagerRoute><CategoriasPage /></ManagerRoute>} />
+        <Route path="fornecedores" element={<ManagerRoute><FornecedoresPage /></ManagerRoute>} />
         <Route path="estoque" element={<EstoquePage />} />
         <Route path="movimentacoes" element={<MovimentacoesPage />} />
         <Route path="usuarios" element={<AdminRoute><UsuariosPage /></AdminRoute>} />

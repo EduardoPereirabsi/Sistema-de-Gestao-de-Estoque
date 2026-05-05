@@ -3,7 +3,7 @@ import { Plus, Pencil, X, UserCheck, UserX, ShieldCheck, User, Eye, EyeOff } fro
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
 
-type Perfil = 'ADMIN' | 'OPERADOR';
+type Perfil = 'ADMIN' | 'GERENTE' | 'OPERADOR';
 
 interface Usuario {
   id: number;
@@ -25,6 +25,24 @@ const usuarioLogado = (): number | null => {
   const raw = localStorage.getItem('user');
   if (!raw) return null;
   try { return JSON.parse(raw).id ?? null; } catch { return null; }
+};
+
+const perfilMeta: Record<Perfil, { label: string; className: string; Icon: typeof ShieldCheck }> = {
+  ADMIN: {
+    label: 'Administrador',
+    className: 'bg-purple-100 text-purple-700',
+    Icon: ShieldCheck,
+  },
+  GERENTE: {
+    label: 'Gerente',
+    className: 'bg-blue-100 text-blue-700',
+    Icon: UserCheck,
+  },
+  OPERADOR: {
+    label: 'Operador',
+    className: 'bg-gray-100 text-gray-600',
+    Icon: User,
+  },
 };
 
 export default function UsuariosPage() {
@@ -150,17 +168,18 @@ export default function UsuariosPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {usuarios.map((u) => (
-                <tr key={u.id} className="hover:bg-gray-50">
+              {usuarios.map((u) => {
+                const perfilInfo = perfilMeta[u.perfil];
+                const PerfilIcon = perfilInfo.Icon;
+
+                return (
+                  <tr key={u.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 font-medium text-gray-800">{u.nome}</td>
                   <td className="px-6 py-4 text-gray-500">{u.email}</td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium
-                      ${u.perfil === 'ADMIN'
-                        ? 'bg-purple-100 text-purple-700'
-                        : 'bg-gray-100 text-gray-600'}`}>
-                      {u.perfil === 'ADMIN' ? <ShieldCheck size={11} /> : <User size={11} />}
-                      {u.perfil === 'ADMIN' ? 'Administrador' : 'Operador'}
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${perfilInfo.className}`}>
+                      <PerfilIcon size={11} />
+                      {perfilInfo.label}
                     </span>
                   </td>
                   <td className="px-6 py-4">
@@ -194,8 +213,9 @@ export default function UsuariosPage() {
                       )}
                     </div>
                   </td>
-                </tr>
-              ))}
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
@@ -262,6 +282,7 @@ export default function UsuariosPage() {
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="OPERADOR">Operador</option>
+                  <option value="GERENTE">Gerente</option>
                   <option value="ADMIN">Administrador</option>
                 </select>
               </div>
@@ -339,6 +360,7 @@ export default function UsuariosPage() {
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="OPERADOR">Operador</option>
+                  <option value="GERENTE">Gerente</option>
                   <option value="ADMIN">Administrador</option>
                 </select>
               </div>

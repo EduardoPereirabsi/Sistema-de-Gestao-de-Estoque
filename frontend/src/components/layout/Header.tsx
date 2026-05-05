@@ -8,6 +8,14 @@ export default function Header() {
   const { usuario, logout } = useAuth();
   const [menuAberto, setMenuAberto] = useState(false);
 
+  const perfilLabel = usuario?.perfil === 'ADMIN'
+    ? 'Administrador'
+    : usuario?.perfil === 'GERENTE'
+      ? 'Gerente'
+      : usuario?.perfil === 'OPERADOR'
+        ? 'Operador'
+        : 'Perfil';
+
   const handleLogout = () => {
     logout();
     navigate('/login');
@@ -29,7 +37,7 @@ export default function Header() {
               {usuario?.nome ?? 'Minha Conta'}
             </p>
             <p className="text-xs text-gray-400 leading-tight">
-              {usuario?.perfil === 'ADMIN' ? 'Administrador' : 'Operador'}
+              {perfilLabel}
               {usuario?.nomeEmpresa ? ` · ${usuario.nomeEmpresa}` : ''}
             </p>
           </div>

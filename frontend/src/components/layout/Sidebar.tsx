@@ -1,24 +1,39 @@
 import { NavLink } from 'react-router-dom';
- import {
-   LayoutDashboard, Package, Tags, Truck,
-   ArrowLeftRight, Users, BarChart2
- } from 'lucide-react';
- 
- const links = [
-   { to: '/painel',        label: 'Painel',         icon: LayoutDashboard },
-   { to: '/produtos',      label: 'Produtos',        icon: Package },
-   { to: '/categorias',    label: 'Categorias',      icon: Tags },
-   { to: '/fornecedores',  label: 'Fornecedores',    icon: Truck },
-   { to: '/estoque',       label: 'Estoque',         icon: BarChart2 },
-   { to: '/movimentacoes', label: 'Movimentações',   icon: ArrowLeftRight },
-   { to: '/usuarios',      label: 'Usuários',        icon: Users },
- ];
- 
- export default function Sidebar() {
-   return (
-     <aside className="w-64 bg-white shadow-md flex flex-col">
-       <div className="p-6 border-b">
-         <h1 className="text-xl font-bold text-blue-600">SmartStock</h1>
+import {
+  LayoutDashboard, Package, Tags, Truck,
+  ArrowLeftRight, Users, BarChart2
+} from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
+
+const adminLinks = [
+  { to: '/painel',        label: 'Painel',         icon: LayoutDashboard },
+  { to: '/produtos',      label: 'Produtos',        icon: Package },
+  { to: '/categorias',    label: 'Categorias',      icon: Tags },
+  { to: '/fornecedores',  label: 'Fornecedores',    icon: Truck },
+  { to: '/estoque',       label: 'Estoque',         icon: BarChart2 },
+  { to: '/movimentacoes', label: 'Movimentações',   icon: ArrowLeftRight },
+  { to: '/usuarios',      label: 'Usuários',        icon: Users },
+];
+
+const gerenteLinks = adminLinks.filter((link) => link.to !== '/usuarios');
+const operadorLinks = [
+  { to: '/estoque',       label: 'Estoque',         icon: BarChart2 },
+  { to: '/movimentacoes', label: 'Movimentações',   icon: ArrowLeftRight },
+];
+  
+export default function Sidebar() {
+  const { usuario } = useAuth();
+
+  const links = usuario?.perfil === 'ADMIN'
+    ? adminLinks
+    : usuario?.perfil === 'GERENTE'
+      ? gerenteLinks
+      : operadorLinks;
+
+  return (
+    <aside className="w-64 bg-white shadow-md flex flex-col">
+      <div className="p-6 border-b">
+        <h1 className="text-xl font-bold text-blue-600">SmartStock</h1>
          <p className="text-xs text-gray-400 mt-1">Gestão de Estoque</p>
        </div>
        <nav className="flex-1 p-4 space-y-1">
