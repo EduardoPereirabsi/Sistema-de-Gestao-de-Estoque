@@ -20,7 +20,7 @@ export default function EstoquePage() {
             <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent" />
           </div>
         ) : produtos.length === 0 ? (
-          <p className="text-center text-green-600 py-12 font-medium">✅ Todos os produtos estão com estoque adequado!</p>
+          <p className="text-center text-green-600 py-12 font-medium">Todos os produtos estão com estoque adequado!</p>
         ) : (
           <>
             <div className="px-4 py-3 bg-red-50 border-b border-red-100 flex items-center gap-2 text-red-700 text-sm font-medium">

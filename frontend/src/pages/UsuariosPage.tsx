@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Plus, Pencil, X, UserCheck, UserX, ShieldCheck, User } from 'lucide-react';
+import { Plus, Pencil, X, UserCheck, UserX, ShieldCheck, User, Eye, EyeOff } from 'lucide-react';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
 
@@ -35,6 +35,8 @@ export default function UsuariosPage() {
   const [confirmAlternar, setConfirmAlternar] = useState<Usuario | null>(null);
   const [formCriar, setFormCriar] = useState<FormCriar>(vazioFormCriar);
   const [formEditar, setFormEditar] = useState<FormEditar>(vazioFormEditar);
+  const [mostrarSenhaCriar, setMostrarSenhaCriar] = useState(false);
+  const [mostrarSenhaEditar, setMostrarSenhaEditar] = useState(false);
   const [salvando, setSalvando] = useState(false);
 
   const idLogado = usuarioLogado();
@@ -53,14 +55,25 @@ export default function UsuariosPage() {
 
   useEffect(() => { carregar(); }, []);
 
+  const abrirCriar = () => {
+    setFormCriar({ ...vazioFormCriar });
+    setMostrarSenhaCriar(false);
+    setModalCriar(true);
+  };
+
+  const fecharCriar = () => {
+    setModalCriar(false);
+    setFormCriar({ ...vazioFormCriar });
+    setMostrarSenhaCriar(false);
+  };
+
   const handleCriar = async (e: React.FormEvent) => {
     e.preventDefault();
     setSalvando(true);
     try {
       await api.post('/api/usuarios', formCriar);
       toast.success('Usuário criado com sucesso!');
-      setModalCriar(false);
-      setFormCriar(vazioFormCriar);
+      fecharCriar();
       carregar();
     } catch {
       toast.error('Erro ao criar usuário');
@@ -104,6 +117,7 @@ export default function UsuariosPage() {
 
   const abrirEditar = (u: Usuario) => {
     setFormEditar({ nome: u.nome, email: u.email, senha: '', perfil: u.perfil });
+    setMostrarSenhaEditar(false);
     setModalEditar(u);
   };
 
@@ -112,7 +126,7 @@ export default function UsuariosPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-gray-800">Usuários</h1>
         <button
-          onClick={() => setModalCriar(true)}
+          onClick={abrirCriar}
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
         >
           <Plus size={16} /> Novo Usuário
@@ -193,15 +207,16 @@ export default function UsuariosPage() {
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
             <div className="flex items-center justify-between px-6 py-4 border-b">
               <h2 className="font-semibold text-gray-800">Novo Usuário</h2>
-              <button onClick={() => { setModalCriar(false); setFormCriar(vazioFormCriar); }}>
+              <button onClick={fecharCriar}>
                 <X size={18} className="text-gray-400 hover:text-gray-600" />
               </button>
             </div>
-            <form onSubmit={handleCriar} className="p-6 space-y-4">
+            <form onSubmit={handleCriar} autoComplete="off" className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nome</label>
                 <input
                   required
+                  autoComplete="off"
                   value={formCriar.nome}
                   onChange={(e) => setFormCriar({ ...formCriar, nome: e.target.value })}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -212,6 +227,7 @@ export default function UsuariosPage() {
                 <input
                   required
                   type="email"
+                  autoComplete="off"
                   value={formCriar.email}
                   onChange={(e) => setFormCriar({ ...formCriar, email: e.target.value })}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -219,14 +235,24 @@ export default function UsuariosPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
-                <input
-                  required
-                  type="password"
-                  minLength={6}
-                  value={formCriar.senha}
-                  onChange={(e) => setFormCriar({ ...formCriar, senha: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <div className="relative">
+                  <input
+                    required
+                    type={mostrarSenhaCriar ? 'text' : 'password'}
+                    minLength={6}
+                    autoComplete="new-password"
+                    value={formCriar.senha}
+                    onChange={(e) => setFormCriar({ ...formCriar, senha: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setMostrarSenhaCriar(!mostrarSenhaCriar)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {mostrarSenhaCriar ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Perfil</label>
@@ -240,7 +266,7 @@ export default function UsuariosPage() {
                 </select>
               </div>
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => { setModalCriar(false); setFormCriar(vazioFormCriar); }}
+                <button type="button" onClick={fecharCriar}
                   className="flex-1 border border-gray-300 text-gray-700 rounded-lg py-2 text-sm hover:bg-gray-50">
                   Cancelar
                 </button>
@@ -288,13 +314,22 @@ export default function UsuariosPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Nova Senha <span className="text-gray-400 font-normal">(deixe em branco para manter)</span>
                 </label>
-                <input
-                  type="password"
-                  minLength={6}
-                  value={formEditar.senha}
-                  onChange={(e) => setFormEditar({ ...formEditar, senha: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                <div className="relative">
+                  <input
+                    type={mostrarSenhaEditar ? 'text' : 'password'}
+                    minLength={6}
+                    value={formEditar.senha}
+                    onChange={(e) => setFormEditar({ ...formEditar, senha: e.target.value })}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setMostrarSenhaEditar(!mostrarSenhaEditar)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {mostrarSenhaEditar ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Perfil</label>

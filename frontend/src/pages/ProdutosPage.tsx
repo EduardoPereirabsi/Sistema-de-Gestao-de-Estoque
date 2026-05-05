@@ -52,7 +52,7 @@ export default function ProdutosPage() {
   const salvar = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.nome.trim()) { toast.error('Nome é obrigatório'); return; }
-    if (!form.sku.trim()) { toast.error('SKU é obrigatório'); return; }
+    if (!form.sku.trim()) { toast.error('Código é obrigatório'); return; }
     setSalvando(true);
     try {
       const body = { nome: form.nome, sku: form.sku, descricao: form.descricao || undefined,
@@ -101,7 +101,7 @@ export default function ProdutosPage() {
               <thead className="bg-gray-50 text-gray-500 text-left">
                 <tr>
                   <th className="px-4 py-3">Produto</th>
-                  <th className="px-4 py-3">SKU</th>
+                  <th className="px-4 py-3">Código</th>
                   <th className="px-4 py-3">Categoria</th>
                   <th className="px-4 py-3">Preço</th>
                   <th className="px-4 py-3">Qtd</th>
@@ -154,7 +154,7 @@ export default function ProdutosPage() {
                     className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nome do produto" />
                 </div>
                 <div className="col-span-2 sm:col-span-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">SKU *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Código *</label>
                   <input value={form.sku} onChange={e => campo('sku', e.target.value)}
                     className="w-full border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Ex: PROD-001" />
                 </div>
