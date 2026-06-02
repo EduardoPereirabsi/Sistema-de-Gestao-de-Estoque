@@ -1,0 +1,122 @@
+﻿{
+  "app": {
+    "title": "Stock Management",
+    "welcome": "Welcome to the system"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "products": "Products",
+    "categories": "Categories",
+    "suppliers": "Suppliers",
+    "movements": "Movements",
+    "stock": "Stock",
+    "users": "Users",
+    "reports": "Reports",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "auth": {
+    "login": "Sign In",
+    "register": "Sign Up",
+    "email": "Email",
+    "password": "Password",
+    "name": "Full name",
+    "confirmPassword": "Confirm password",
+    "forgotPassword": "Forgot password?",
+    "resetPassword": "Reset password",
+    "noAccount": "Don't have an account?",
+    "hasAccount": "Already have an account?",
+    "loginTitle": "Sign in to your account",
+    "registerTitle": "Create your account"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "totalProducts": "Total Products",
+    "totalCategories": "Categories",
+    "totalSuppliers": "Suppliers",
+    "stockValue": "Stock Value",
+    "lowStock": "Low Stock",
+    "monthMovements": "Monthly Movements",
+    "chartTitle": "Movements - Last 7 Days",
+    "chartEntries": "Entries",
+    "chartExits": "Exits",
+    "chartAdjustments": "Adjustments"
+  },
+  "products": {
+    "title": "Products",
+    "add": "New Product",
+    "edit": "Edit Product",
+    "name": "Name",
+    "sku": "Code",
+    "price": "Price",
+    "costPrice": "Cost Price",
+    "quantity": "Quantity",
+    "minQuantity": "Minimum Stock",
+    "category": "Category",
+    "supplier": "Supplier",
+    "description": "Description",
+    "search": "Search products..."
+  },
+  "categories": {
+    "title": "Categories",
+    "add": "New Category",
+    "edit": "Edit Category",
+    "name": "Name",
+    "description": "Description"
+  },
+  "suppliers": {
+    "title": "Suppliers",
+    "add": "New Supplier",
+    "edit": "Edit Supplier",
+    "name": "Name",
+    "cnpj": "Tax ID",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address"
+  },
+  "movements": {
+    "title": "Movements",
+    "add": "New Movement",
+    "entry": "Entry",
+    "exit": "Exit",
+    "adjustment": "Adjustment",
+    "product": "Product",
+    "quantity": "Quantity",
+    "reason": "Reason",
+    "type": "Type",
+    "date": "Date",
+    "user": "User"
+  },
+  "users": {
+    "title": "Users",
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "active": "Active",
+    "admin": "Administrator",
+    "user": "User"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "loading": "Loading...",
+    "noData": "No data found",
+    "confirm": "Confirm",
+    "actions": "Actions",
+    "success": "Success",
+    "error": "Error",
+    "currency": "$"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark"
+  },
+  "language": {
+    "ptBR": "Portugu├¬s",
+    "enUS": "English"
+  }
+}

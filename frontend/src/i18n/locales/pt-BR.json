@@ -1,0 +1,122 @@
+﻿{
+  "app": {
+    "title": "Gest├úo de Estoque",
+    "welcome": "Bem-vindo ao sistema"
+  },
+  "nav": {
+    "dashboard": "Painel",
+    "products": "Produtos",
+    "categories": "Categorias",
+    "suppliers": "Fornecedores",
+    "movements": "Movimenta├º├Áes",
+    "stock": "Estoque",
+    "users": "Usu├írios",
+    "reports": "Relat├│rios",
+    "settings": "Configura├º├Áes",
+    "logout": "Sair"
+  },
+  "auth": {
+    "login": "Entrar",
+    "register": "Cadastrar",
+    "email": "Email",
+    "password": "Senha",
+    "name": "Nome completo",
+    "confirmPassword": "Confirmar senha",
+    "forgotPassword": "Esqueceu a senha?",
+    "resetPassword": "Redefinir senha",
+    "noAccount": "N├úo tem conta?",
+    "hasAccount": "J├í tem conta?",
+    "loginTitle": "Acesse sua conta",
+    "registerTitle": "Crie sua conta"
+  },
+  "dashboard": {
+    "title": "Painel",
+    "totalProducts": "Total de Produtos",
+    "totalCategories": "Categorias",
+    "totalSuppliers": "Fornecedores",
+    "stockValue": "Valor do Estoque",
+    "lowStock": "Estoque Baixo",
+    "monthMovements": "Movimenta├º├Áes do M├¬s",
+    "chartTitle": "Movimenta├º├Áes dos ├Ültimos 7 Dias",
+    "chartEntries": "Entradas",
+    "chartExits": "Sa├¡das",
+    "chartAdjustments": "Ajustes"
+  },
+  "products": {
+    "title": "Produtos",
+    "add": "Novo Produto",
+    "edit": "Editar Produto",
+    "name": "Nome",
+    "sku": "C├│digo",
+    "price": "Pre├ºo",
+    "costPrice": "Pre├ºo de Custo",
+    "quantity": "Quantidade",
+    "minQuantity": "Estoque M├¡nimo",
+    "category": "Categoria",
+    "supplier": "Fornecedor",
+    "description": "Descri├º├úo",
+    "search": "Buscar produtos..."
+  },
+  "categories": {
+    "title": "Categorias",
+    "add": "Nova Categoria",
+    "edit": "Editar Categoria",
+    "name": "Nome",
+    "description": "Descri├º├úo"
+  },
+  "suppliers": {
+    "title": "Fornecedores",
+    "add": "Novo Fornecedor",
+    "edit": "Editar Fornecedor",
+    "name": "Nome",
+    "cnpj": "CNPJ",
+    "email": "Email",
+    "phone": "Telefone",
+    "address": "Endere├ºo"
+  },
+  "movements": {
+    "title": "Movimenta├º├Áes",
+    "add": "Nova Movimenta├º├úo",
+    "entry": "Entrada",
+    "exit": "Sa├¡da",
+    "adjustment": "Ajuste",
+    "product": "Produto",
+    "quantity": "Quantidade",
+    "reason": "Motivo",
+    "type": "Tipo",
+    "date": "Data",
+    "user": "Usu├írio"
+  },
+  "users": {
+    "title": "Usu├írios",
+    "name": "Nome",
+    "email": "Email",
+    "role": "Permiss├úo",
+    "active": "Ativo",
+    "admin": "Administrador",
+    "user": "Usu├írio"
+  },
+  "common": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "create": "Criar",
+    "search": "Buscar",
+    "loading": "Carregando...",
+    "noData": "Nenhum dado encontrado",
+    "confirm": "Confirmar",
+    "actions": "A├º├Áes",
+    "success": "Sucesso",
+    "error": "Erro",
+    "currency": "R$"
+  },
+  "theme": {
+    "light": "Claro",
+    "dark": "Escuro"
+  },
+  "language": {
+    "ptBR": "Portugu├¬s",
+    "enUS": "English"
+  }
+}
