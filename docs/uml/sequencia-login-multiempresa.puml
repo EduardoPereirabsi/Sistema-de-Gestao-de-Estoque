@@ -1,0 +1,31 @@
+@startuml
+actor Usuario
+participant "LoginPage" as LoginPage
+participant "AuthContext" as AuthContext
+participant "AutenticacaoController" as Controller
+participant "AutenticacaoService" as Service
+participant "JwtTokenProvider" as Jwt
+
+Usuario -> LoginPage : informa email e senha
+LoginPage -> AuthContext : login(email, senha)
+AuthContext -> Controller : POST /api/auth/login
+Controller -> Service : login(request)
+Service -> Service : buscar usuarios por email
+
+alt email vinculado a mais de uma empresa
+  Service --> Controller : lista de empresas
+  Controller --> AuthContext : empresas
+  AuthContext --> LoginPage : empresas disponiveis
+  Usuario -> LoginPage : seleciona empresa
+  LoginPage -> AuthContext : login(email, senha, empresaId)
+  AuthContext -> Controller : POST /api/auth/login
+  Controller -> Service : login(request com empresaId)
+end
+
+Service -> Jwt : generateAccessToken(userId)
+Service -> Jwt : generateRefreshToken(userId)
+Service --> Controller : tokens + usuario
+Controller --> AuthContext : resposta autenticada
+AuthContext --> LoginPage : sessao ativa
+LoginPage --> Usuario : redireciona para o sistema
+@enduml

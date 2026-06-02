@@ -101,6 +101,8 @@
   "common": {
     "save": "Salvar",
     "cancel": "Cancelar",
+    "openMenu": "Abrir menu",
+    "closeMenu": "Fechar menu",
     "delete": "Excluir",
     "edit": "Editar",
     "create": "Criar",

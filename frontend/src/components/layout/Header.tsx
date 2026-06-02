@@ -1,11 +1,15 @@
-import { ChevronDown, Globe, LogOut, Moon, Sun, User } from 'lucide-react';
+import { ChevronDown, Globe, LogOut, Menu, Moon, Sun, User } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 
-export default function Header() {
+interface HeaderProps {
+  onMenuToggle: () => void;
+}
+
+export default function Header({ onMenuToggle }: HeaderProps) {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { usuario, logout } = useAuth();
@@ -34,7 +38,15 @@ export default function Header() {
 
   return (
     <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm px-6 py-4 flex items-center justify-between">
-      <div />
+      <button
+        type="button"
+        onClick={onMenuToggle}
+        aria-label={t('common.openMenu')}
+        className="md:hidden p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+      >
+        <Menu size={20} />
+      </button>
+      <div className="hidden md:block" />
       <div className="relative flex items-center gap-2 sm:gap-3">
         <button
           type="button"

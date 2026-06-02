@@ -75,7 +75,14 @@ npm run dev
 │       ├── services/      # Serviços API (Axios)
 │       ├── types/         # Tipos TypeScript
 │       └── utils/         # Funções utilitárias
-└── docs/              # Documentação
+├── docs/              # Documentacao de processo, BDD e UML
+│   ├── 01-sprints-e-gitflow.md
+│   ├── 02-requisitos-e-user-stories.md
+│   ├── 03-plano-de-testes-e-qualidade.md
+│   ├── 04-banco-avancado.md
+│   ├── features/
+│   └── uml/
+└── README.md
 ```
 
 ## 👥 Equipe

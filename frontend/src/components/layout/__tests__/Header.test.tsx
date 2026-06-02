@@ -7,6 +7,7 @@ import i18n from '../../../i18n';
 
 const mockNavigate = vi.fn();
 const mockLogout = vi.fn();
+const mockMenuToggle = vi.fn();
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual<typeof import('react-router-dom')>('react-router-dom');
@@ -33,7 +34,7 @@ vi.mock('../../../contexts/AuthContext', () => ({
 function renderHeader() {
   return render(
     <ThemeProvider>
-      <Header />
+      <Header onMenuToggle={mockMenuToggle} />
     </ThemeProvider>,
   );
 }
@@ -61,6 +62,14 @@ describe('Header', () => {
 
     expect(i18n.language).toBe('en-US');
     expect(screen.getByText('EN')).toBeInTheDocument();
+  });
+
+  it('deve abrir o menu lateral no mobile', async () => {
+    renderHeader();
+
+    await userEvent.click(screen.getByLabelText('Abrir menu'));
+
+    expect(mockMenuToggle).toHaveBeenCalledTimes(1);
   });
 
   it('deve alternar o tema', async () => {

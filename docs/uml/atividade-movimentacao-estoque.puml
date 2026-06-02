@@ -1,0 +1,33 @@
+@startuml
+start
+:Receber tipo, produto, quantidade e motivo;
+:Buscar produto na empresa atual;
+
+if (Produto existe?) then (sim)
+  if (Tipo = SAIDA?) then (sim)
+    if (Quantidade disponivel >= solicitada?) then (sim)
+      :Subtrair do estoque;
+    else (nao)
+      :Retornar erro de estoque insuficiente;
+      stop
+    endif
+  elseif (Tipo = ENTRADA?) then (sim)
+    :Somar ao estoque;
+  else (AJUSTE)
+    :Definir quantidade absoluta;
+  endif
+
+  :Persistir produto;
+  :Persistir movimentacao;
+
+  if (Estoque abaixo do minimo?) then (sim)
+    :Publicar alerta via WebSocket;
+  endif
+
+  :Retornar movimentacao criada;
+else (nao)
+  :Retornar produto nao encontrado;
+endif
+
+stop
+@enduml

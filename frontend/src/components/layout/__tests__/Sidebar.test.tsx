@@ -1,10 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import Sidebar from '../Sidebar';
 import i18n from '../../../i18n';
 
 const mockUseAuth = vi.fn();
+const mockOnToggle = vi.fn();
 
 vi.mock('../../../contexts/AuthContext', () => ({
   useAuth: () => mockUseAuth(),
@@ -13,7 +15,7 @@ vi.mock('../../../contexts/AuthContext', () => ({
 function renderSidebar() {
   return render(
     <MemoryRouter>
-      <Sidebar />
+      <Sidebar open onToggle={mockOnToggle} />
     </MemoryRouter>,
   );
 }
@@ -21,6 +23,7 @@ function renderSidebar() {
 describe('Sidebar', () => {
   beforeEach(async () => {
     mockUseAuth.mockReset();
+    mockOnToggle.mockReset();
     await i18n.changeLanguage('pt-BR');
   });
 
@@ -75,5 +78,18 @@ describe('Sidebar', () => {
     expect(screen.getByRole('link', { name: /Movimenta/i })).toBeInTheDocument();
     expect(screen.queryByText('Painel')).not.toBeInTheDocument();
     expect(screen.queryByText('Produtos')).not.toBeInTheDocument();
+  });
+
+  it('deve permitir fechar a sidebar pelo botao de fechar', async () => {
+    mockUseAuth.mockReturnValue({
+      usuario: { perfil: 'ADMIN', nomeEmpresa: 'Empresa X' },
+    });
+
+    renderSidebar();
+
+    const botoesFechar = screen.getAllByLabelText('Fechar menu');
+    await userEvent.click(botoesFechar[botoesFechar.length - 1]);
+
+    expect(mockOnToggle).toHaveBeenCalledTimes(1);
   });
 });
