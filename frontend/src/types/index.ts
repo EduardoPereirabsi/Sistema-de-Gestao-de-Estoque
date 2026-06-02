@@ -7,6 +7,11 @@ export interface Empresa {
   ativo: boolean;
 }
 
+export interface EmpresaAutenticacao {
+  id: number;
+  nome: string;
+}
+
 export interface Usuario {
   id: number;
   nome: string;
@@ -66,7 +71,7 @@ export interface AutenticacaoResponse {
   accessToken?: string;
   refreshToken?: string;
   usuario?: Usuario;
-  empresas?: Empresa[];
+  empresas?: EmpresaAutenticacao[];
 }
 
 export interface PainelResponse {
