@@ -2,18 +2,9 @@ import { useEffect, useState } from 'react';
 import { Plus, Pencil, X, UserCheck, UserX, ShieldCheck, User, Eye, EyeOff } from 'lucide-react';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
+import type { Usuario as UsuarioApp } from '../types';
 
-type Perfil = 'ADMIN' | 'GERENTE' | 'OPERADOR';
-
-interface Usuario {
-  id: number;
-  nome: string;
-  email: string;
-  perfil: Perfil;
-  ativo: boolean;
-  nomeEmpresa: string;
-  criadoEm: string;
-}
+type Perfil = UsuarioApp['perfil'];
 
 interface FormCriar { nome: string; email: string; senha: string; perfil: Perfil; }
 interface FormEditar { nome: string; email: string; senha: string; perfil: Perfil; }
@@ -22,7 +13,7 @@ const vazioFormCriar: FormCriar = { nome: '', email: '', senha: '', perfil: 'OPE
 const vazioFormEditar: FormEditar = { nome: '', email: '', senha: '', perfil: 'OPERADOR' };
 
 const usuarioLogado = (): number | null => {
-  const raw = localStorage.getItem('user');
+  const raw = localStorage.getItem('usuario');
   if (!raw) return null;
   try { return JSON.parse(raw).id ?? null; } catch { return null; }
 };
@@ -46,11 +37,11 @@ const perfilMeta: Record<Perfil, { label: string; className: string; Icon: typeo
 };
 
 export default function UsuariosPage() {
-  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [usuarios, setUsuarios] = useState<UsuarioApp[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [modalCriar, setModalCriar] = useState(false);
-  const [modalEditar, setModalEditar] = useState<Usuario | null>(null);
-  const [confirmAlternar, setConfirmAlternar] = useState<Usuario | null>(null);
+  const [modalEditar, setModalEditar] = useState<UsuarioApp | null>(null);
+  const [confirmAlternar, setConfirmAlternar] = useState<UsuarioApp | null>(null);
   const [formCriar, setFormCriar] = useState<FormCriar>(vazioFormCriar);
   const [formEditar, setFormEditar] = useState<FormEditar>(vazioFormEditar);
   const [mostrarSenhaCriar, setMostrarSenhaCriar] = useState(false);
@@ -62,7 +53,7 @@ export default function UsuariosPage() {
   const carregar = async () => {
     try {
       setCarregando(true);
-      const { data } = await api.get<Usuario[]>('/api/usuarios');
+      const { data } = await api.get<UsuarioApp[]>('/api/usuarios');
       setUsuarios(data);
     } catch {
       toast.error('Erro ao carregar usuários');
@@ -122,7 +113,7 @@ export default function UsuariosPage() {
     }
   };
 
-  const handleAlternarAtivo = async (usuario: Usuario) => {
+  const handleAlternarAtivo = async (usuario: UsuarioApp) => {
     try {
       await api.patch(`/api/usuarios/${usuario.id}/alternar-ativo`);
       toast.success(usuario.ativo ? 'Usuário desativado' : 'Usuário ativado');
@@ -133,7 +124,7 @@ export default function UsuariosPage() {
     }
   };
 
-  const abrirEditar = (u: Usuario) => {
+  const abrirEditar = (u: UsuarioApp) => {
     setFormEditar({ nome: u.nome, email: u.email, senha: '', perfil: u.perfil });
     setMostrarSenhaEditar(false);
     setModalEditar(u);

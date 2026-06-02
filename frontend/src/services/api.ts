@@ -25,7 +25,7 @@ api.interceptors.response.use(
     if (status === 401) {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
-      localStorage.removeItem('user');
+      localStorage.removeItem('usuario');
       window.location.href = '/login';
     } else if (status === 403) {
       toast.error('Acesso negado. Você não tem permissão para esta ação.');
