@@ -41,8 +41,15 @@ public class ProdutoResponse {
     @Schema(description = "Indica se o estoque está abaixo do mínimo", example = "false")
     private boolean estoqueAbaixo;
 
+    @Schema(description = "Categoria vinculada ao produto")
     private CategoriaResponse categoria;
+
+    @Schema(description = "Fornecedor vinculado ao produto")
     private FornecedorResponse fornecedor;
+
+    @Schema(description = "Data/hora de criação do produto", example = "2026-06-02T13:40:00")
     private LocalDateTime criadoEm;
+
+    @Schema(description = "Data/hora da última atualização do produto", example = "2026-06-02T13:45:00")
     private LocalDateTime atualizadoEm;
 }

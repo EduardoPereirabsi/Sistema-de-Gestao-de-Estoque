@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeftRight, Plus, X } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { api } from '../services/api';
 import type { Movimentacao, Produto, PageResponse } from '../types';
