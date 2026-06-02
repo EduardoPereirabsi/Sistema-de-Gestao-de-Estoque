@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "empresas")
+@Table(name = "EMPRESAS")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -16,25 +16,26 @@ public class Empresa {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID")
     private Long id;
 
-    @Column(nullable = false, length = 150)
+    @Column(name = "NOME", nullable = false, length = 150)
     private String nome;
 
-    @Column(nullable = false, unique = true, length = 18)
+    @Column(name = "CNPJ", nullable = false, unique = true, length = 18)
     private String cnpj;
 
-    @Column(length = 150)
+    @Column(name = "EMAIL", length = 150)
     private String email;
 
-    @Column(length = 20)
+    @Column(name = "TELEFONE", length = 20)
     private String telefone;
 
     @Builder.Default
-    @Column(nullable = false)
+    @Column(name = "ATIVO", nullable = false)
     private Boolean ativo = true;
 
-    @Column(name = "criado_em", nullable = false, updatable = false)
+    @Column(name = "CRIADO_EM", nullable = false, updatable = false)
     private LocalDateTime criadoEm;
 
     @PrePersist

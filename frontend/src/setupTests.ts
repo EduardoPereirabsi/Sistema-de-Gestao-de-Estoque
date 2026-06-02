@@ -1,5 +1,13 @@
-﻿import '@testing-library/jest-dom';
-import './i18n';
+import '@testing-library/jest-dom';
+import { beforeEach } from 'vitest';
+import i18n from './i18n';
+
+beforeEach(async () => {
+  localStorage.removeItem('i18nextLng');
+  localStorage.removeItem('theme');
+  document.documentElement.classList.remove('light', 'dark');
+  await i18n.changeLanguage('pt-BR');
+});
 
 if (typeof window.matchMedia === 'undefined') {
   Object.defineProperty(window, 'matchMedia', {

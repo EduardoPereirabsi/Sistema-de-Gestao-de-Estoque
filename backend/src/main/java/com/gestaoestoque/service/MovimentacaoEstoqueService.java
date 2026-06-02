@@ -35,16 +35,10 @@ public class MovimentacaoEstoqueService {
     public MovimentacaoResponse create(MovimentacaoRequest request) {
         Long empresaId = empresaContexto.getCurrentCompanyId();
 
-        Produto produto = produtoRepository.findById(request.getProdutoId())
+        Produto produto = produtoRepository.findByIdAndEmpresaIdAndAtivoTrue(request.getProdutoId(), empresaId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException(
                         "Produto não encontrado com ID: " + request.getProdutoId()
                 ));
-
-        if (!produto.getEmpresa().getId().equals(empresaId)) {
-            throw new RecursoNaoEncontradoException(
-                    "Produto não encontrado com ID: " + request.getProdutoId()
-            );
-        }
 
         Usuario usuario = empresaContexto.getCurrentUser();
 

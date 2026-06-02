@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import LoginPage from '../LoginPage';
+import { ThemeProvider } from '../../contexts/ThemeContext';
 
 const mockNavigate = vi.fn();
 const mockLogin = vi.fn();
@@ -26,12 +27,16 @@ describe('LoginPage', () => {
     vi.clearAllMocks();
   });
 
-  it('deve renderizar formulario de login', () => {
-    render(
+  const renderPage = () => render(
+    <ThemeProvider>
       <MemoryRouter>
         <LoginPage />
-      </MemoryRouter>,
-    );
+      </MemoryRouter>
+    </ThemeProvider>,
+  );
+
+  it('deve renderizar formulario de login', () => {
+    renderPage();
 
     expect(screen.getByText('SmartStock')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Entrar/i })).toBeInTheDocument();
@@ -45,11 +50,7 @@ describe('LoginPage', () => {
     });
 
     const user = userEvent.setup();
-    const { container } = render(
-      <MemoryRouter>
-        <LoginPage />
-      </MemoryRouter>,
-    );
+    const { container } = renderPage();
 
     const inputs = Array.from(container.querySelectorAll('input'));
     await user.type(inputs[0], 'maria@empresa.com');
@@ -69,11 +70,7 @@ describe('LoginPage', () => {
     });
 
     const user = userEvent.setup();
-    const { container } = render(
-      <MemoryRouter>
-        <LoginPage />
-      </MemoryRouter>,
-    );
+    const { container } = renderPage();
 
     const inputs = Array.from(container.querySelectorAll('input'));
     await user.type(inputs[0], 'maria@empresa.com');

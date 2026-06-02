@@ -182,4 +182,23 @@ class ProdutoServiceTest {
         assertThat(response.get(0).isEstoqueAbaixo()).isTrue();
         verify(produtoRepository).findLowStockProductsByEmpresaId(1L);
     }
+
+    @Test
+    void delete_deveInativarProdutoSemExcluirHistorico() {
+        Produto produto = Produto.builder()
+                .id(3L)
+                .nome("Mouse Logitech")
+                .sku("MOUSE-001")
+                .empresa(empresa)
+                .ativo(true)
+                .build();
+
+        when(empresaContexto.getCurrentCompanyId()).thenReturn(1L);
+        when(produtoRepository.findByIdAndEmpresaIdAndAtivoTrue(3L, 1L)).thenReturn(Optional.of(produto));
+
+        produtoService.delete(3L);
+
+        assertThat(produto.getAtivo()).isFalse();
+        verify(produtoRepository).save(produto);
+    }
 }

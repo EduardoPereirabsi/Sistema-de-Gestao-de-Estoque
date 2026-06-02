@@ -31,18 +31,17 @@ public class ProdutoService {
 
     public Page<ProdutoResponse> findAll(Pageable pageable) {
         Long empresaId = empresaContexto.getCurrentCompanyId();
-        return produtoRepository.findByEmpresaId(empresaId, pageable).map(this::mapToResponse);
+        return produtoRepository.findByEmpresaIdAndAtivoTrue(empresaId, pageable).map(this::mapToResponse);
     }
 
     public ProdutoResponse findById(Long id) {
-        Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Produto não encontrado com ID: " + id));
-        return mapToResponse(produto);
+        return mapToResponse(buscarProdutoAtivoDaEmpresa(id));
     }
 
     public Page<ProdutoResponse> search(String nome, Pageable pageable) {
         Long empresaId = empresaContexto.getCurrentCompanyId();
-        return produtoRepository.findByNomeContainingIgnoreCaseAndEmpresaId(nome, empresaId, pageable).map(this::mapToResponse);
+        return produtoRepository.findByNomeContainingIgnoreCaseAndEmpresaIdAndAtivoTrue(nome, empresaId, pageable)
+                .map(this::mapToResponse);
     }
 
     public List<ProdutoResponse> findLowStock() {
@@ -56,7 +55,7 @@ public class ProdutoService {
     public ProdutoResponse create(ProdutoRequest request) {
         Long empresaId = empresaContexto.getCurrentCompanyId();
         if (produtoRepository.existsBySkuAndEmpresaId(request.getSku(), empresaId)) {
-            throw new RecursoDuplicadoException("Código já cadastrado: " + request.getSku());
+            throw new RecursoDuplicadoException("SKU já cadastrado: " + request.getSku());
         }
 
         Produto produto = Produto.builder()
@@ -88,12 +87,11 @@ public class ProdutoService {
 
     @Transactional
     public ProdutoResponse update(Long id, ProdutoRequest request) {
-        Produto produto = produtoRepository.findById(id)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Produto não encontrado com ID: " + id));
+        Produto produto = buscarProdutoAtivoDaEmpresa(id);
 
         Long empresaId = empresaContexto.getCurrentCompanyId();
         if (!produto.getSku().equals(request.getSku()) && produtoRepository.existsBySkuAndEmpresaId(request.getSku(), empresaId)) {
-            throw new RecursoDuplicadoException("Código já cadastrado: " + request.getSku());
+            throw new RecursoDuplicadoException("SKU já cadastrado: " + request.getSku());
         }
 
         produto.setNome(request.getNome());
@@ -126,10 +124,15 @@ public class ProdutoService {
 
     @Transactional
     public void delete(Long id) {
-        if (!produtoRepository.existsById(id)) {
-            throw new RecursoNaoEncontradoException("Produto não encontrado com ID: " + id);
-        }
-        produtoRepository.deleteById(id);
+        Produto produto = buscarProdutoAtivoDaEmpresa(id);
+        produto.setAtivo(false);
+        produtoRepository.save(produto);
+    }
+
+    private Produto buscarProdutoAtivoDaEmpresa(Long id) {
+        Long empresaId = empresaContexto.getCurrentCompanyId();
+        return produtoRepository.findByIdAndEmpresaIdAndAtivoTrue(id, empresaId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Produto não encontrado com ID: " + id));
     }
 
     private ProdutoResponse mapToResponse(Produto produto) {

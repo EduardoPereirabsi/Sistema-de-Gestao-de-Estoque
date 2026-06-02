@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import CadastroPage from '../CadastroPage';
+import { ThemeProvider } from '../../contexts/ThemeContext';
 
 const mockNavigate = vi.fn();
 const mockCadastrar = vi.fn();
@@ -26,12 +27,16 @@ describe('CadastroPage', () => {
     vi.clearAllMocks();
   });
 
-  it('deve renderizar o formulario de cadastro', () => {
-    render(
+  const renderPage = () => render(
+    <ThemeProvider>
       <MemoryRouter>
         <CadastroPage />
-      </MemoryRouter>,
-    );
+      </MemoryRouter>
+    </ThemeProvider>,
+  );
+
+  it('deve renderizar o formulario de cadastro', () => {
+    renderPage();
 
     expect(screen.getByRole('heading', { name: 'Criar Conta' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Criar Conta/i })).toBeInTheDocument();
@@ -40,11 +45,7 @@ describe('CadastroPage', () => {
   it('deve cadastrar usuario com os dados informados', async () => {
     mockCadastrar.mockResolvedValueOnce(undefined);
     const user = userEvent.setup();
-    const { container } = render(
-      <MemoryRouter>
-        <CadastroPage />
-      </MemoryRouter>,
-    );
+    const { container } = renderPage();
 
     const inputs = Array.from(container.querySelectorAll('input'));
     await user.type(inputs[0], 'Maria Silva');

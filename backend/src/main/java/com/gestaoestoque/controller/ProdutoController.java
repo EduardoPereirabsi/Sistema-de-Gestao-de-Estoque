@@ -141,7 +141,7 @@ public class ProdutoController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
-    @Operation(summary = "Remover produto", description = "Remove um produto pelo ID")
+    @Operation(summary = "Remover produto", description = "Inativa um produto pelo ID preservando o histórico de movimentações")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Produto removido com sucesso"),
             @ApiResponse(responseCode = "401", description = "Usuário não autenticado",

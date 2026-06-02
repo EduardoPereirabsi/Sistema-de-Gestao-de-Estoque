@@ -23,31 +23,33 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
     Page<Produto> findByFornecedorId(Long fornecedorId, Pageable pageable);
 
-    @Query("SELECT p FROM Produto p WHERE p.quantidade <= p.quantidadeMinima")
+    @Query("SELECT p FROM Produto p WHERE p.quantidade <= p.quantidadeMinima AND p.ativo = true")
     List<Produto> findLowStockProducts();
 
     Page<Produto> findByNomeContainingIgnoreCase(String nome, Pageable pageable);
 
-    @Query("SELECT COALESCE(SUM(p.quantidade * p.preco), 0) FROM Produto p")
+    @Query("SELECT COALESCE(SUM(p.quantidade * p.preco), 0) FROM Produto p WHERE p.ativo = true")
     BigDecimal calculateTotalStockValue();
 
-    @Query("SELECT COUNT(p) FROM Produto p WHERE p.quantidade <= p.quantidadeMinima")
+    @Query("SELECT COUNT(p) FROM Produto p WHERE p.quantidade <= p.quantidadeMinima AND p.ativo = true")
     Long countLowStockProducts();
 
-    Page<Produto> findByEmpresaId(Long empresaId, Pageable pageable);
+    Page<Produto> findByEmpresaIdAndAtivoTrue(Long empresaId, Pageable pageable);
 
-    Page<Produto> findByNomeContainingIgnoreCaseAndEmpresaId(String nome, Long empresaId, Pageable pageable);
+    Page<Produto> findByNomeContainingIgnoreCaseAndEmpresaIdAndAtivoTrue(String nome, Long empresaId, Pageable pageable);
 
-    @Query("SELECT p FROM Produto p WHERE p.quantidade <= p.quantidadeMinima AND p.empresa.id = :empresaId")
+    Optional<Produto> findByIdAndEmpresaIdAndAtivoTrue(Long id, Long empresaId);
+
+    @Query("SELECT p FROM Produto p WHERE p.quantidade <= p.quantidadeMinima AND p.empresa.id = :empresaId AND p.ativo = true")
     List<Produto> findLowStockProductsByEmpresaId(@Param("empresaId") Long empresaId);
 
     boolean existsBySkuAndEmpresaId(String sku, Long empresaId);
 
-    @Query("SELECT COALESCE(SUM(p.quantidade * p.preco), 0) FROM Produto p WHERE p.empresa.id = :empresaId")
+    @Query("SELECT COALESCE(SUM(p.quantidade * p.preco), 0) FROM Produto p WHERE p.empresa.id = :empresaId AND p.ativo = true")
     BigDecimal calculateTotalStockValueByEmpresaId(@Param("empresaId") Long empresaId);
 
-    @Query("SELECT COUNT(p) FROM Produto p WHERE p.quantidade <= p.quantidadeMinima AND p.empresa.id = :empresaId")
+    @Query("SELECT COUNT(p) FROM Produto p WHERE p.quantidade <= p.quantidadeMinima AND p.empresa.id = :empresaId AND p.ativo = true")
     Long countLowStockProductsByEmpresaId(@Param("empresaId") Long empresaId);
 
-    long countByEmpresaId(Long empresaId);
+    long countByEmpresaIdAndAtivoTrue(Long empresaId);
 }

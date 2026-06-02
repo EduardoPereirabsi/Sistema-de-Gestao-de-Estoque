@@ -40,7 +40,7 @@ public class PainelService {
 
 
         return PainelResponse.builder()
-                .totalProdutos(produtoRepository.countByEmpresaId(empresaId))
+                .totalProdutos(produtoRepository.countByEmpresaIdAndAtivoTrue(empresaId))
                 .totalCategorias((long) categoriaRepository.findByEmpresaId(empresaId).size())
                 .totalFornecedores((long) fornecedorRepository.findByEmpresaId(empresaId).size())
                 .valorTotalEstoque(produtoRepository.calculateTotalStockValueByEmpresaId(empresaId))

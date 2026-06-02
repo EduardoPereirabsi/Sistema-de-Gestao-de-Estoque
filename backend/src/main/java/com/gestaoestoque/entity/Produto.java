@@ -62,6 +62,10 @@ public class Produto {
     @JoinColumn(name = "FORNECEDOR_ID")
     private Fornecedor fornecedor;
 
+    @Builder.Default
+    @Column(name = "ATIVO", nullable = false)
+    private Boolean ativo = true;
+
     @CreationTimestamp
     @Column(name = "CRIADO_EM", updatable = false)
     private LocalDateTime criadoEm;

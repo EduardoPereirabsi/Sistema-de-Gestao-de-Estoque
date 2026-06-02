@@ -5,29 +5,30 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "categorias")
+@Table(name = "CATEGORIAS")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Categoria {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ID")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "empresa_id", nullable = false)
+    @JoinColumn(name = "EMPRESA_ID", nullable = false)
     private Empresa empresa;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "NOME", nullable = false, length = 100)
     private String nome;
 
-    @Column(length = 255)
+    @Column(name = "DESCRICAO", length = 255)
     private String descricao;
 
     @Builder.Default
-    @Column(nullable = false)
+    @Column(name = "ATIVO", nullable = false)
     private Boolean ativo = true;
 
-    @Column(name = "criado_em", nullable = false, updatable = false)
+    @Column(name = "CRIADO_EM", nullable = false, updatable = false)
     private LocalDateTime criadoEm;
 
     @PrePersist

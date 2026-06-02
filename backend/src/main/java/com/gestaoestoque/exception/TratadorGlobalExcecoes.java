@@ -3,6 +3,7 @@ package com.gestaoestoque.exception;
 import com.gestaoestoque.dto.response.ErroResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
@@ -93,6 +94,16 @@ public class TratadorGlobalExcecoes {
                 .errors(errors)
                 .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErroResponse> handleDataIntegrity(DataIntegrityViolationException ex) {
+        ErroResponse error = ErroResponse.builder()
+                .status(HttpStatus.CONFLICT.value())
+                .message("Não foi possível concluir a operação porque o registro está vinculado a outros dados.")
+                .timestamp(LocalDateTime.now())
+                .build();
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
     @ExceptionHandler(Exception.class)
