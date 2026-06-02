@@ -1,6 +1,6 @@
-﻿{
+{
   "app": {
-    "title": "Gest├úo de Estoque",
+    "title": "Gest\u00e3o de Estoque",
     "welcome": "Bem-vindo ao sistema"
   },
   "nav": {
@@ -8,11 +8,11 @@
     "products": "Produtos",
     "categories": "Categorias",
     "suppliers": "Fornecedores",
-    "movements": "Movimenta├º├Áes",
+    "movements": "Movimenta\u00e7\u00f5es",
     "stock": "Estoque",
-    "users": "Usu├írios",
-    "reports": "Relat├│rios",
-    "settings": "Configura├º├Áes",
+    "users": "Usu\u00e1rios",
+    "reports": "Relat\u00f3rios",
+    "settings": "Configura\u00e7\u00f5es",
     "logout": "Sair"
   },
   "auth": {
@@ -24,8 +24,8 @@
     "confirmPassword": "Confirmar senha",
     "forgotPassword": "Esqueceu a senha?",
     "resetPassword": "Redefinir senha",
-    "noAccount": "N├úo tem conta?",
-    "hasAccount": "J├í tem conta?",
+    "noAccount": "N\u00e3o tem conta?",
+    "hasAccount": "J\u00e1 tem conta?",
     "loginTitle": "Acesse sua conta",
     "registerTitle": "Crie sua conta"
   },
@@ -36,10 +36,10 @@
     "totalSuppliers": "Fornecedores",
     "stockValue": "Valor do Estoque",
     "lowStock": "Estoque Baixo",
-    "monthMovements": "Movimenta├º├Áes do M├¬s",
-    "chartTitle": "Movimenta├º├Áes dos ├Ültimos 7 Dias",
+    "monthMovements": "Movimenta\u00e7\u00f5es do M\u00eas",
+    "chartTitle": "Movimenta\u00e7\u00f5es dos \u00daltimos 7 Dias",
     "chartEntries": "Entradas",
-    "chartExits": "Sa├¡das",
+    "chartExits": "Sa\u00eddas",
     "chartAdjustments": "Ajustes"
   },
   "products": {
@@ -47,14 +47,14 @@
     "add": "Novo Produto",
     "edit": "Editar Produto",
     "name": "Nome",
-    "sku": "C├│digo",
-    "price": "Pre├ºo",
-    "costPrice": "Pre├ºo de Custo",
+    "sku": "C\u00f3digo",
+    "price": "Pre\u00e7o",
+    "costPrice": "Pre\u00e7o de Custo",
     "quantity": "Quantidade",
-    "minQuantity": "Estoque M├¡nimo",
+    "minQuantity": "Estoque M\u00ednimo",
     "category": "Categoria",
     "supplier": "Fornecedor",
-    "description": "Descri├º├úo",
+    "description": "Descri\u00e7\u00e3o",
     "search": "Buscar produtos..."
   },
   "categories": {
@@ -62,7 +62,7 @@
     "add": "Nova Categoria",
     "edit": "Editar Categoria",
     "name": "Nome",
-    "description": "Descri├º├úo"
+    "description": "Descri\u00e7\u00e3o"
   },
   "suppliers": {
     "title": "Fornecedores",
@@ -72,29 +72,31 @@
     "cnpj": "CNPJ",
     "email": "Email",
     "phone": "Telefone",
-    "address": "Endere├ºo"
+    "address": "Endere\u00e7o"
   },
   "movements": {
-    "title": "Movimenta├º├Áes",
-    "add": "Nova Movimenta├º├úo",
+    "title": "Movimenta\u00e7\u00f5es",
+    "add": "Nova Movimenta\u00e7\u00e3o",
     "entry": "Entrada",
-    "exit": "Sa├¡da",
+    "exit": "Sa\u00edda",
     "adjustment": "Ajuste",
     "product": "Produto",
     "quantity": "Quantidade",
     "reason": "Motivo",
     "type": "Tipo",
     "date": "Data",
-    "user": "Usu├írio"
+    "user": "Usu\u00e1rio"
   },
   "users": {
-    "title": "Usu├írios",
+    "title": "Usu\u00e1rios",
     "name": "Nome",
     "email": "Email",
-    "role": "Permiss├úo",
+    "role": "Permiss\u00e3o",
     "active": "Ativo",
     "admin": "Administrador",
-    "user": "Usu├írio"
+    "manager": "Gerente",
+    "operator": "Operador",
+    "user": "Usu\u00e1rio"
   },
   "common": {
     "save": "Salvar",
@@ -106,7 +108,7 @@
     "loading": "Carregando...",
     "noData": "Nenhum dado encontrado",
     "confirm": "Confirmar",
-    "actions": "A├º├Áes",
+    "actions": "A\u00e7\u00f5es",
     "success": "Sucesso",
     "error": "Erro",
     "currency": "R$"
@@ -116,7 +118,7 @@
     "dark": "Escuro"
   },
   "language": {
-    "ptBR": "Portugu├¬s",
+    "ptBR": "Portugu\u00eas",
     "enUS": "English"
   }
 }

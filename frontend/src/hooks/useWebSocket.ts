@@ -27,7 +27,7 @@ export function useWebSocket() {
       client.subscribe('/topic/low-stock', (message) => {
         const body = message.body;
         toast(body, {
-          icon: 'ÔÜá´©Å',
+          icon: '\u26A0\uFE0F',
           duration: 6000,
           style: {
             background: '#fef3c7',

@@ -1,7 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Sidebar from '../Sidebar';
+import i18n from '../../../i18n';
 
 const mockUseAuth = vi.fn();
 
@@ -18,9 +19,27 @@ function renderSidebar() {
 }
 
 describe('Sidebar', () => {
+  beforeEach(async () => {
+    mockUseAuth.mockReset();
+    await i18n.changeLanguage('pt-BR');
+  });
+
+  it('deve traduzir links para ingles', async () => {
+    await i18n.changeLanguage('en-US');
+    mockUseAuth.mockReturnValue({
+      usuario: { perfil: 'ADMIN', nomeEmpresa: 'Company X' },
+    });
+
+    renderSidebar();
+
+    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+    expect(screen.getByText('Products')).toBeInTheDocument();
+    expect(screen.getByText('Suppliers')).toBeInTheDocument();
+  });
+
   it('deve mostrar todos os links para admin', () => {
     mockUseAuth.mockReturnValue({
-      usuario: { perfil: 'ADMIN' },
+      usuario: { perfil: 'ADMIN', nomeEmpresa: 'Empresa X' },
     });
 
     renderSidebar();
@@ -30,8 +49,8 @@ describe('Sidebar', () => {
     expect(screen.getByText('Categorias')).toBeInTheDocument();
     expect(screen.getByText('Fornecedores')).toBeInTheDocument();
     expect(screen.getByText('Estoque')).toBeInTheDocument();
-    expect(screen.getByText('Movimentações')).toBeInTheDocument();
-    expect(screen.getByText('Usuários')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Movimenta/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Usu/i })).toBeInTheDocument();
   });
 
   it('nao deve mostrar usuarios para gerente', () => {
@@ -41,7 +60,7 @@ describe('Sidebar', () => {
 
     renderSidebar();
 
-    expect(screen.queryByText('Usuários')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Usu/i })).not.toBeInTheDocument();
     expect(screen.getByText('Produtos')).toBeInTheDocument();
   });
 
@@ -53,7 +72,7 @@ describe('Sidebar', () => {
     renderSidebar();
 
     expect(screen.getByText('Estoque')).toBeInTheDocument();
-    expect(screen.getByText('Movimentações')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Movimenta/i })).toBeInTheDocument();
     expect(screen.queryByText('Painel')).not.toBeInTheDocument();
     expect(screen.queryByText('Produtos')).not.toBeInTheDocument();
   });

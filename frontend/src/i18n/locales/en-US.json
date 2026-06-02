@@ -94,6 +94,8 @@
     "role": "Role",
     "active": "Active",
     "admin": "Administrator",
+    "manager": "Manager",
+    "operator": "Operator",
     "user": "User"
   },
   "common": {
@@ -116,7 +118,7 @@
     "dark": "Dark"
   },
   "language": {
-    "ptBR": "Portugu├¬s",
+    "ptBR": "Portugu\u00eas",
     "enUS": "English"
   }
 }
