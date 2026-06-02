@@ -1,4 +1,4 @@
-﻿{
+{
   "app": {
     "title": "Stock Management",
     "welcome": "Welcome to the system"
@@ -17,17 +17,26 @@
   },
   "auth": {
     "login": "Sign In",
-    "register": "Sign Up",
+    "register": "Create account",
     "email": "Email",
     "password": "Password",
     "name": "Full name",
+    "companyName": "Company name",
     "confirmPassword": "Confirm password",
     "forgotPassword": "Forgot password?",
     "resetPassword": "Reset password",
     "noAccount": "Don't have an account?",
     "hasAccount": "Already have an account?",
     "loginTitle": "Sign in to your account",
-    "registerTitle": "Create your account"
+    "registerTitle": "Create Account",
+    "selectCompany": "Choose a company",
+    "selectCompanyDescription": "Your email is linked to more than one company. Choose where you want to sign in.",
+    "loginFailed": "We couldn't complete your sign in.",
+    "invalidCredentials": "Invalid email or password.",
+    "credentialsExpired": "Your credentials expired. Please sign in again.",
+    "selectCompanyFailed": "We couldn't complete the sign in for the selected company.",
+    "selectCompanyInvalid": "We couldn't sign in to the selected company.",
+    "registerFailed": "We couldn't create your account. Check the data and try again."
   },
   "dashboard": {
     "title": "Dashboard",
@@ -50,19 +59,42 @@
     "sku": "Code",
     "price": "Price",
     "costPrice": "Cost Price",
+    "salePrice": "Sale Price",
     "quantity": "Quantity",
     "minQuantity": "Minimum Stock",
     "category": "Category",
     "supplier": "Supplier",
     "description": "Description",
-    "search": "Search products..."
+    "search": "Search products...",
+    "empty": "No products found.",
+    "low": "Low",
+    "created": "Product created!",
+    "updated": "Product updated!",
+    "deleted": "Product deleted!",
+    "deleteConfirm": "Do you want to delete this product?",
+    "nameRequired": "Name is required",
+    "skuRequired": "Code is required",
+    "noCategory": "No category",
+    "noSupplier": "No supplier",
+    "optionalDescription": "Optional description",
+    "namePlaceholder": "Product name",
+    "skuPlaceholder": "Example: PROD-001",
+    "pricePlaceholder": "0.00"
   },
   "categories": {
     "title": "Categories",
     "add": "New Category",
     "edit": "Edit Category",
     "name": "Name",
-    "description": "Description"
+    "description": "Description",
+    "empty": "No categories found.",
+    "created": "Category created!",
+    "updated": "Category updated!",
+    "deleted": "Category deleted!",
+    "deleteConfirm": "Do you want to delete this category?",
+    "nameRequired": "Name is required",
+    "namePlaceholder": "Category name",
+    "descriptionPlaceholder": "Optional description"
   },
   "suppliers": {
     "title": "Suppliers",
@@ -72,11 +104,23 @@
     "cnpj": "Tax ID",
     "email": "Email",
     "phone": "Phone",
-    "address": "Address"
+    "address": "Address",
+    "empty": "No suppliers found.",
+    "created": "Supplier created!",
+    "updated": "Supplier updated!",
+    "deleted": "Supplier deleted!",
+    "deleteConfirm": "Do you want to delete this supplier?",
+    "nameRequired": "Name is required",
+    "namePlaceholder": "Supplier name",
+    "cnpjPlaceholder": "00.000.000/0000-00",
+    "phonePlaceholder": "(00) 00000-0000",
+    "emailPlaceholder": "contact@supplier.com",
+    "addressPlaceholder": "Street, number, city..."
   },
   "movements": {
     "title": "Movements",
     "add": "New Movement",
+    "newTitle": "New Movement",
     "entry": "Entry",
     "exit": "Exit",
     "adjustment": "Adjustment",
@@ -85,22 +129,55 @@
     "reason": "Reason",
     "type": "Type",
     "date": "Date",
-    "user": "User"
+    "user": "User",
+    "empty": "No movements found.",
+    "created": "Movement recorded!",
+    "productRequired": "Select a product",
+    "quantityRequired": "Enter a valid quantity",
+    "reasonPlaceholder": "Optional reason",
+    "selectPlaceholder": "Select..."
   },
   "users": {
     "title": "Users",
+    "add": "New User",
+    "edit": "Edit User",
     "name": "Name",
     "email": "Email",
     "role": "Role",
+    "status": "Status",
     "active": "Active",
+    "inactive": "Inactive",
     "admin": "Administrator",
     "manager": "Manager",
     "operator": "Operator",
-    "user": "User"
+    "user": "User",
+    "empty": "No users found.",
+    "loadingError": "Error loading users",
+    "created": "User created successfully!",
+    "createError": "Error creating user",
+    "updated": "User updated!",
+    "updateError": "Error updating user",
+    "activated": "User activated",
+    "deactivated": "User deactivated",
+    "toggleError": "Error changing status",
+    "newPasswordHint": "leave blank to keep the current one",
+    "activateTitle": "Activate user?",
+    "deactivateTitle": "Deactivate user?",
+    "activateMessage": "{{name}} will regain access to the system.",
+    "deactivateMessage": "{{name}} will lose access to the system.",
+    "activateAction": "Activate",
+    "deactivateAction": "Deactivate"
+  },
+  "stock": {
+    "title": "Stock Control",
+    "allGood": "All products are at healthy stock levels!",
+    "lowCount": "{{count}} product(s) below minimum stock",
+    "currentQuantity": "Current Quantity"
   },
   "common": {
     "save": "Save",
     "cancel": "Cancel",
+    "back": "Back",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "delete": "Delete",
@@ -108,19 +185,24 @@
     "create": "Create",
     "search": "Search",
     "loading": "Loading...",
+    "saving": "Saving...",
     "noData": "No data found",
     "confirm": "Confirm",
     "actions": "Actions",
     "success": "Success",
     "error": "Error",
-    "currency": "$"
+    "currency": "$",
+    "previous": "Previous",
+    "next": "Next",
+    "pageInfo": "Page {{current}} of {{total}}",
+    "none": "—"
   },
   "theme": {
     "light": "Light",
     "dark": "Dark"
   },
   "language": {
-    "ptBR": "Portugu\u00eas",
+    "ptBR": "Português",
     "enUS": "English"
   }
 }

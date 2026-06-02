@@ -4,8 +4,10 @@ import { z } from 'zod';
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Package, Eye, EyeOff, LogIn, Building2, ArrowLeft } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import type { EmpresaAutenticacao } from '../types';
+import AuthPageControls from '../components/auth/AuthPageControls';
 
 const loginSchema = z.object({
   email: z.string().email('E-mail inválido'),
@@ -14,9 +16,12 @@ const loginSchema = z.object({
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
+const inputClassName = 'w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10 placeholder:text-gray-400 dark:placeholder:text-gray-500';
+
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { t } = useTranslation();
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [erro, setErro] = useState('');
   const [carregando, setCarregando] = useState(false);
@@ -51,11 +56,11 @@ export default function LoginPage() {
         return;
       }
 
-      setErro('Não foi possível concluir o login.');
+      setErro(t('auth.loginFailed'));
     } catch (err: unknown) {
       setEmpresas([]);
       setCredenciais(null);
-      setErro(obterMensagemErro(err, 'E-mail ou senha inválidos.'));
+      setErro(obterMensagemErro(err, t('auth.invalidCredentials')));
     } finally {
       setCarregando(false);
     }
@@ -63,7 +68,7 @@ export default function LoginPage() {
 
   const selecionarEmpresa = async (empresaId: number) => {
     if (!credenciais) {
-      setErro('As credenciais expiraram. Faça o login novamente.');
+      setErro(t('auth.credentialsExpired'));
       setEmpresas([]);
       return;
     }
@@ -78,9 +83,9 @@ export default function LoginPage() {
         return;
       }
 
-      setErro('Não foi possível concluir o login na empresa selecionada.');
+      setErro(t('auth.selectCompanyFailed'));
     } catch (err: unknown) {
-      setErro(obterMensagemErro(err, 'Não foi possível entrar na empresa selecionada.'));
+      setErro(obterMensagemErro(err, t('auth.selectCompanyInvalid')));
     } finally {
       setCarregando(false);
     }
@@ -93,23 +98,26 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-md p-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center p-4 transition-colors">
+      <div className="w-full max-w-md bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-md p-8 relative">
+        <div className="absolute right-6 top-6">
+          <AuthPageControls />
+        </div>
 
         <div className="flex flex-col items-center mb-8">
           <div className="bg-blue-600 text-white p-3 rounded-xl mb-3">
             <Package size={32} />
           </div>
-          <h1 className="text-2xl font-bold text-gray-800">SmartStock</h1>
-          <p className="text-gray-500 text-sm mt-1">Gestão de Estoque</p>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">SmartStock</h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{t('app.title')}</p>
         </div>
 
         {empresas.length > 0 ? (
           <div className="space-y-5">
             <div className="text-center">
-              <h2 className="text-lg font-semibold text-gray-800">Selecione a empresa</h2>
-              <p className="text-sm text-gray-500 mt-1">
-                Seu e-mail está vinculado a mais de uma empresa. Escolha onde deseja entrar.
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{t('auth.selectCompany')}</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                {t('auth.selectCompanyDescription')}
               </p>
             </div>
 
@@ -120,38 +128,40 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => selecionarEmpresa(empresa.id)}
                   disabled={carregando}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-left hover:border-blue-500 hover:bg-blue-50 disabled:opacity-60 disabled:cursor-not-allowed transition-colors flex items-center gap-3"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-4 py-3 text-left hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 disabled:opacity-60 disabled:cursor-not-allowed transition-colors flex items-center gap-3 bg-white dark:bg-gray-900"
                 >
-                  <span className="bg-blue-100 text-blue-700 p-2 rounded-lg">
+                  <span className="bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 p-2 rounded-lg">
                     <Building2 size={18} />
                   </span>
-                  <span className="font-medium text-gray-800">{empresa.nome}</span>
+                  <span className="font-medium text-gray-800 dark:text-gray-100">{empresa.nome}</span>
                 </button>
               ))}
             </div>
 
             {erro && (
-              <p className="text-red-500 text-sm text-center bg-red-50 py-2 rounded-lg">{erro}</p>
+              <p className="text-red-600 dark:text-red-300 text-sm text-center bg-red-50 dark:bg-red-900/30 py-2 rounded-lg">
+                {erro}
+              </p>
             )}
 
             <button
               type="button"
               onClick={voltarParaCredenciais}
               disabled={carregando}
-              className="w-full text-gray-600 hover:text-gray-800 font-medium py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-60"
+              className="w-full text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 font-medium py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-60"
             >
               <ArrowLeft size={16} />
-              Voltar
+              {t('common.back')}
             </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('auth.email')}</label>
               <input
                 type="email"
                 {...register('email')}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`${inputClassName} pr-4`}
               />
               {errors.email && (
                 <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
@@ -159,17 +169,17 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('auth.password')}</label>
               <div className="relative">
                 <input
                   type={mostrarSenha ? 'text' : 'password'}
                   {...register('senha')}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                  className={inputClassName}
                 />
                 <button
                   type="button"
                   onClick={() => setMostrarSenha(!mostrarSenha)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                 >
                   {mostrarSenha ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -180,7 +190,9 @@ export default function LoginPage() {
             </div>
 
             {erro && (
-              <p className="text-red-500 text-sm text-center bg-red-50 py-2 rounded-lg">{erro}</p>
+              <p className="text-red-600 dark:text-red-300 text-sm text-center bg-red-50 dark:bg-red-900/30 py-2 rounded-lg">
+                {erro}
+              </p>
             )}
 
             <button
@@ -193,15 +205,15 @@ export default function LoginPage() {
               ) : (
                 <>
                   <LogIn size={16} />
-                  Entrar
+                  {t('auth.login')}
                 </>
               )}
             </button>
 
-            <p className="text-center text-sm text-gray-500">
-              Não tem conta?{' '}
+            <p className="text-center text-sm text-gray-500 dark:text-gray-400">
+              {t('auth.noAccount')}{' '}
               <Link to="/cadastro" className="text-blue-600 hover:underline font-medium">
-                Criar conta
+                {t('auth.register')}
               </Link>
             </p>
           </form>
