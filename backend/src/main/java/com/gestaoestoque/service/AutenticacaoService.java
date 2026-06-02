@@ -32,37 +32,33 @@ public class AutenticacaoService {
     private final PasswordEncoder passwordEncoder;
 
     public AutenticacaoResponse login(LoginRequest request) {
-        var usuario = usuarioRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RequisicaoInvalidaException("Email ou senha inválidos"));
+        List<Usuario> usuariosValidos = buscarUsuariosValidos(request.getEmail(), request.getSenha());
 
-        if (!passwordEncoder.matches(request.getSenha(), usuario.getSenha())) {
-            throw new RequisicaoInvalidaException("Email ou senha inválidos");
+        if (request.getEmpresaId() != null) {
+            Usuario usuario = usuariosValidos.stream()
+                    .filter(u -> u.getEmpresa().getId().equals(request.getEmpresaId()))
+                    .findFirst()
+                    .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado nesta empresa"));
+
+            return buildAuthResponse(usuario);
         }
 
-        if (!usuario.getAtivo()) {
-            throw new RequisicaoInvalidaException("Usuário inativo. Contate o administrador.");
+        if (usuariosValidos.size() == 1) {
+            return buildAuthResponse(usuariosValidos.get(0));
         }
 
-        if (request.getEmpresaId() == null) {
-            List<EmpresaResponse> empresas = usuarioRepository.findAllByEmail(request.getEmail())
-                    .stream()
-                    .map(u -> new EmpresaResponse(u.getEmpresa().getId(), u.getEmpresa().getNome()))
-                    .distinct()
-                    .toList();
-            if (empresas.size() > 1) {
-                return AutenticacaoResponse.builder().empresas(empresas).build();
-            }
-        }
+        List<EmpresaResponse> empresas = usuariosValidos.stream()
+                .map(u -> new EmpresaResponse(u.getEmpresa().getId(), u.getEmpresa().getNome()))
+                .distinct()
+                .toList();
 
-        return buildAuthResponse(usuario);
+        return AutenticacaoResponse.builder()
+                .empresas(empresas)
+                .build();
     }
 
     @Transactional
     public AutenticacaoResponse register(CadastroRequest request) {
-        if (usuarioRepository.existsByEmail(request.getEmail())) {
-            throw new RequisicaoInvalidaException("Email já cadastrado");
-        }
-
         Empresa empresa = Empresa.builder()
                 .nome(request.getNomeEmpresa() != null ? request.getNomeEmpresa() : request.getNome() + " Empresa")
                 .cnpj("00.000.000/0000-00")
@@ -85,16 +81,21 @@ public class AutenticacaoService {
 
     @Transactional
     public void forgotPassword(String email) {
-        var usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
+        List<Usuario> usuarios = usuarioRepository.findAllByEmail(email);
+        if (usuarios.isEmpty()) {
+            throw new RecursoNaoEncontradoException("Usuário não encontrado");
+        }
 
-        String token = UUID.randomUUID().toString();
-        usuario.setTokenRecuperacao(token);
-        usuario.setTokenRecuperacaoExpiracao(LocalDateTime.now().plusHours(2));
-        usuarioRepository.save(usuario);
+        for (Usuario usuario : usuarios) {
+            String token = UUID.randomUUID().toString();
+            usuario.setTokenRecuperacao(token);
+            usuario.setTokenRecuperacaoExpiracao(LocalDateTime.now().plusHours(2));
+            usuarioRepository.save(usuario);
 
-        // Em produção: enviar por email. Por ora, exibe no console.
-        System.out.println("[RECUPERAÇÃO DE SENHA] Token para " + email + ": " + token);
+            // Em produção: enviar por email. Por ora, exibe no console.
+            System.out.println("[RECUPERAÇÃO DE SENHA] Token para " + email
+                    + " na empresa " + usuario.getEmpresa().getNome() + ": " + token);
+        }
     }
 
     @Transactional
@@ -110,6 +111,26 @@ public class AutenticacaoService {
         usuario.setTokenRecuperacao(null);
         usuario.setTokenRecuperacaoExpiracao(null);
         usuarioRepository.save(usuario);
+    }
+
+    private List<Usuario> buscarUsuariosValidos(String email, String senha) {
+        List<Usuario> usuariosComSenhaValida = usuarioRepository.findAllByEmail(email).stream()
+                .filter(usuario -> passwordEncoder.matches(senha, usuario.getSenha()))
+                .toList();
+
+        if (usuariosComSenhaValida.isEmpty()) {
+            throw new RequisicaoInvalidaException("Email ou senha inválidos");
+        }
+
+        List<Usuario> usuariosAtivos = usuariosComSenhaValida.stream()
+                .filter(Usuario::getAtivo)
+                .toList();
+
+        if (usuariosAtivos.isEmpty()) {
+            throw new RequisicaoInvalidaException("Usuário inativo. Contate o administrador.");
+        }
+
+        return usuariosAtivos;
     }
 
     private AutenticacaoResponse buildAuthResponse(Usuario usuario) {

@@ -38,12 +38,15 @@ public class UsuarioService {
 
     @Transactional
     public UsuarioResponse create(UsuarioCriarRequest request) {
-        if (usuarioRepository.existsByEmail(request.getEmail())) {
-            throw new RecursoDuplicadoException("Email já cadastrado: " + request.getEmail());
+        Usuario usuarioLogado = empresaContexto.getCurrentUser();
+        Long empresaId = usuarioLogado.getEmpresa().getId();
+
+        if (usuarioRepository.existsByEmailAndEmpresaId(request.getEmail(), empresaId)) {
+            throw new RecursoDuplicadoException("Email já cadastrado nesta empresa: " + request.getEmail());
         }
 
         Usuario usuario = Usuario.builder()
-                .empresa(empresaContexto.getCurrentUser().getEmpresa())
+                .empresa(usuarioLogado.getEmpresa())
                 .nome(request.getNome())
                 .email(request.getEmail())
                 .senha(passwordEncoder.encode(request.getSenha()))
@@ -58,13 +61,14 @@ public class UsuarioService {
     @Transactional
     public UsuarioResponse update(Long id, UsuarioAtualizarRequest request) {
         Usuario usuario = buscarPorIdNaEmpresa(id);
+        Long empresaId = usuario.getEmpresa().getId();
 
         if (request.getNome() != null) {
             usuario.setNome(request.getNome());
         }
         if (request.getEmail() != null && !request.getEmail().equals(usuario.getEmail())) {
-            if (usuarioRepository.existsByEmail(request.getEmail())) {
-                throw new RecursoDuplicadoException("Email já cadastrado: " + request.getEmail());
+            if (usuarioRepository.existsByEmailAndEmpresaId(request.getEmail(), empresaId)) {
+                throw new RecursoDuplicadoException("Email já cadastrado nesta empresa: " + request.getEmail());
             }
             usuario.setEmail(request.getEmail());
         }
@@ -97,12 +101,8 @@ public class UsuarioService {
 
     private Usuario buscarPorIdNaEmpresa(Long id) {
         Long empresaId = empresaContexto.getCurrentCompanyId();
-        Usuario usuario = usuarioRepository.findById(id)
+        return usuarioRepository.findByIdAndEmpresaId(id, empresaId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado com ID: " + id));
-        if (!usuario.getEmpresa().getId().equals(empresaId)) {
-            throw new RecursoNaoEncontradoException("Usuário não encontrado com ID: " + id);
-        }
-        return usuario;
     }
 
     private UsuarioResponse mapToResponse(Usuario usuario) {
