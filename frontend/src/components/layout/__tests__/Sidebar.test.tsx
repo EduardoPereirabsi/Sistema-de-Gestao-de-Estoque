@@ -67,17 +67,20 @@ describe('Sidebar', () => {
     expect(screen.getByText('Produtos')).toBeInTheDocument();
   });
 
-  it('deve mostrar apenas estoque e movimentacoes para operador', () => {
+  it('deve mostrar todas as telas exceto usuarios para operador', () => {
     mockUseAuth.mockReturnValue({
       usuario: { perfil: 'OPERADOR' },
     });
 
     renderSidebar();
 
+    expect(screen.getByText('Painel')).toBeInTheDocument();
+    expect(screen.getByText('Produtos')).toBeInTheDocument();
+    expect(screen.getByText('Categorias')).toBeInTheDocument();
+    expect(screen.getByText('Fornecedores')).toBeInTheDocument();
     expect(screen.getByText('Estoque')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Movimenta/i })).toBeInTheDocument();
-    expect(screen.queryByText('Painel')).not.toBeInTheDocument();
-    expect(screen.queryByText('Produtos')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Usu/i })).not.toBeInTheDocument();
   });
 
   it('deve permitir fechar a sidebar pelo botao de fechar', async () => {

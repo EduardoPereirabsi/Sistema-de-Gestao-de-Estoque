@@ -3,6 +3,8 @@ import { Plus, Pencil, Trash2, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
+import { useAuth } from '../contexts/AuthContext';
+import ConfirmDialog from '../components/common/ConfirmDialog';
 import type { Fornecedor } from '../types';
 
 interface FormData { nome: string; cnpj: string; email: string; telefone: string; endereco: string; }
@@ -13,10 +15,13 @@ const inputClassName = 'w-full border border-gray-300 dark:border-gray-600 bg-wh
 
 export default function FornecedoresPage() {
   const { t } = useTranslation();
+  const { isAdminOrGerente } = useAuth();
   const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [modal, setModal] = useState(false);
   const [editando, setEditando] = useState<Fornecedor | null>(null);
+  const [confirmExclusao, setConfirmExclusao] = useState<Fornecedor | null>(null);
+  const [excluindo, setExcluindo] = useState(false);
   const [form, setForm] = useState<FormData>(vazio);
   const [salvando, setSalvando] = useState(false);
 
@@ -27,8 +32,20 @@ export default function FornecedoresPage() {
 
   useEffect(() => { carregar(); }, []);
 
-  const abrirNovo = () => { setEditando(null); setForm(vazio); setModal(true); };
+  const abrirNovo = () => {
+    if (!isAdminOrGerente) {
+      toast.error(t('common.permissionDenied'));
+      return;
+    }
+    setEditando(null);
+    setForm(vazio);
+    setModal(true);
+  };
   const abrirEditar = (f: Fornecedor) => {
+    if (!isAdminOrGerente) {
+      toast.error(t('common.permissionDenied'));
+      return;
+    }
     setEditando(f);
     setForm({ nome: f.nome, cnpj: f.cnpj ?? '', email: f.email ?? '', telefone: f.telefone ?? '', endereco: f.endereco ?? '' });
     setModal(true);
@@ -38,6 +55,10 @@ export default function FornecedoresPage() {
 
   const salvar = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isAdminOrGerente) {
+      toast.error(t('common.permissionDenied'));
+      return;
+    }
     if (!form.nome.trim()) {
       toast.error(t('suppliers.nameRequired'));
       return;
@@ -58,14 +79,26 @@ export default function FornecedoresPage() {
     }
   };
 
-  const excluir = async (id: number) => {
-    if (!confirm(t('suppliers.deleteConfirm'))) return;
+  const solicitarExclusao = (fornecedor: Fornecedor) => {
+    if (!isAdminOrGerente) {
+      toast.error(t('common.permissionDenied'));
+      return;
+    }
+    setConfirmExclusao(fornecedor);
+  };
+
+  const excluir = async () => {
+    if (!confirmExclusao) return;
+    setExcluindo(true);
     try {
-      await api.delete(`/api/suppliers/${id}`);
+      await api.delete(`/api/suppliers/${confirmExclusao.id}`);
       toast.success(t('suppliers.deleted'));
+      setConfirmExclusao(null);
       carregar();
     } catch {
       toast.error(t('common.error'));
+    } finally {
+      setExcluindo(false);
     }
   };
 
@@ -73,9 +106,11 @@ export default function FornecedoresPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{t('suppliers.title')}</h1>
-        <button onClick={abrirNovo} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-          <Plus size={16} /> {t('suppliers.add')}
-        </button>
+        {isAdminOrGerente && (
+          <button onClick={abrirNovo} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+            <Plus size={16} /> {t('suppliers.add')}
+          </button>
+        )}
       </div>
 
       <div className={cardClassName}>
@@ -91,7 +126,7 @@ export default function FornecedoresPage() {
                 <th className="px-4 py-3">{t('suppliers.cnpj')}</th>
                 <th className="px-4 py-3">{t('suppliers.email')}</th>
                 <th className="px-4 py-3">{t('suppliers.phone')}</th>
-                <th className="px-4 py-3 text-right">{t('common.actions')}</th>
+                {isAdminOrGerente && <th className="px-4 py-3 text-right">{t('common.actions')}</th>}
               </tr>
             </thead>
             <tbody>
@@ -101,14 +136,16 @@ export default function FornecedoresPage() {
                   <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{f.cnpj ?? t('common.none')}</td>
                   <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{f.email ?? t('common.none')}</td>
                   <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{f.telefone ?? t('common.none')}</td>
-                  <td className="px-4 py-3 text-right space-x-1">
-                    <button onClick={() => abrirEditar(f)} className="text-blue-500 hover:text-blue-700 p-1 rounded" title={t('common.edit')}>
-                      <Pencil size={15} />
-                    </button>
-                    <button onClick={() => excluir(f.id)} className="text-red-500 hover:text-red-700 p-1 rounded" title={t('common.delete')}>
-                      <Trash2 size={15} />
-                    </button>
-                  </td>
+                  {isAdminOrGerente && (
+                    <td className="px-4 py-3 text-right space-x-1">
+                      <button onClick={() => abrirEditar(f)} className="text-blue-500 hover:text-blue-700 p-1 rounded" title={t('common.edit')}>
+                        <Pencil size={15} />
+                      </button>
+                      <button onClick={() => solicitarExclusao(f)} className="text-red-500 hover:text-red-700 p-1 rounded" title={t('common.delete')}>
+                        <Trash2 size={15} />
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -164,6 +201,17 @@ export default function FornecedoresPage() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!confirmExclusao}
+        title={t('suppliers.deleteTitle')}
+        message={confirmExclusao ? t('suppliers.deleteMessage', { name: confirmExclusao.nome }) : ''}
+        confirmLabel={t('common.delete')}
+        cancelLabel={t('common.cancel')}
+        loading={excluindo}
+        onConfirm={excluir}
+        onCancel={() => setConfirmExclusao(null)}
+      />
     </div>
   );
 }

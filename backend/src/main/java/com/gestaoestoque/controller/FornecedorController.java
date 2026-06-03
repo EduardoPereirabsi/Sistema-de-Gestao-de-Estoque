@@ -24,7 +24,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/suppliers")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
 @SecurityRequirement(name = "Bearer")
 @Tag(name = "Fornecedores", description = "CRUD de fornecedores")
 public class FornecedorController {
@@ -32,6 +31,7 @@ public class FornecedorController {
     private final FornecedorService fornecedorService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE','OPERADOR')")
     @Operation(summary = "Listar fornecedores", description = "Retorna todos os fornecedores")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fornecedores retornados com sucesso",
@@ -46,6 +46,7 @@ public class FornecedorController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE','OPERADOR')")
     @Operation(summary = "Buscar fornecedor", description = "Retorna um fornecedor pelo ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fornecedor retornado com sucesso",
@@ -62,6 +63,7 @@ public class FornecedorController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     @Operation(summary = "Criar fornecedor", description = "Cadastra um novo fornecedor")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Fornecedor criado com sucesso",
@@ -80,6 +82,7 @@ public class FornecedorController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     @Operation(summary = "Atualizar fornecedor", description = "Atualiza um fornecedor existente")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Fornecedor atualizado com sucesso",
@@ -100,6 +103,7 @@ public class FornecedorController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     @Operation(summary = "Remover fornecedor", description = "Remove um fornecedor pelo ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Fornecedor removido com sucesso"),

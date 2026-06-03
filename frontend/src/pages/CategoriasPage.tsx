@@ -3,6 +3,8 @@ import { Plus, Pencil, Trash2, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
+import { useAuth } from '../contexts/AuthContext';
+import ConfirmDialog from '../components/common/ConfirmDialog';
 import type { Categoria } from '../types';
 
 interface FormData { nome: string; descricao: string; }
@@ -13,10 +15,13 @@ const inputClassName = 'w-full border border-gray-300 dark:border-gray-600 bg-wh
 
 export default function CategoriasPage() {
   const { t } = useTranslation();
+  const { isAdminOrGerente } = useAuth();
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [modal, setModal] = useState(false);
   const [editando, setEditando] = useState<Categoria | null>(null);
+  const [confirmExclusao, setConfirmExclusao] = useState<Categoria | null>(null);
+  const [excluindo, setExcluindo] = useState(false);
   const [form, setForm] = useState<FormData>(vazio);
   const [salvando, setSalvando] = useState(false);
 
@@ -27,8 +32,20 @@ export default function CategoriasPage() {
 
   useEffect(() => { carregar(); }, []);
 
-  const abrirNovo = () => { setEditando(null); setForm(vazio); setModal(true); };
+  const abrirNovo = () => {
+    if (!isAdminOrGerente) {
+      toast.error(t('common.permissionDenied'));
+      return;
+    }
+    setEditando(null);
+    setForm(vazio);
+    setModal(true);
+  };
   const abrirEditar = (c: Categoria) => {
+    if (!isAdminOrGerente) {
+      toast.error(t('common.permissionDenied'));
+      return;
+    }
     setEditando(c);
     setForm({ nome: c.nome, descricao: c.descricao ?? '' });
     setModal(true);
@@ -37,6 +54,10 @@ export default function CategoriasPage() {
 
   const salvar = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isAdminOrGerente) {
+      toast.error(t('common.permissionDenied'));
+      return;
+    }
     if (!form.nome.trim()) {
       toast.error(t('categories.nameRequired'));
       return;
@@ -57,14 +78,26 @@ export default function CategoriasPage() {
     }
   };
 
-  const excluir = async (id: number) => {
-    if (!confirm(t('categories.deleteConfirm'))) return;
+  const solicitarExclusao = (categoria: Categoria) => {
+    if (!isAdminOrGerente) {
+      toast.error(t('common.permissionDenied'));
+      return;
+    }
+    setConfirmExclusao(categoria);
+  };
+
+  const excluir = async () => {
+    if (!confirmExclusao) return;
+    setExcluindo(true);
     try {
-      await api.delete(`/api/categories/${id}`);
+      await api.delete(`/api/categories/${confirmExclusao.id}`);
       toast.success(t('categories.deleted'));
+      setConfirmExclusao(null);
       carregar();
     } catch {
       toast.error(t('common.error'));
+    } finally {
+      setExcluindo(false);
     }
   };
 
@@ -72,12 +105,14 @@ export default function CategoriasPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{t('categories.title')}</h1>
-        <button
-          onClick={abrirNovo}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-        >
-          <Plus size={16} /> {t('categories.add')}
-        </button>
+        {isAdminOrGerente && (
+          <button
+            onClick={abrirNovo}
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          >
+            <Plus size={16} /> {t('categories.add')}
+          </button>
+        )}
       </div>
 
       <div className={cardClassName}>
@@ -93,7 +128,7 @@ export default function CategoriasPage() {
               <tr>
                 <th className="px-4 py-3">{t('categories.name')}</th>
                 <th className="px-4 py-3">{t('categories.description')}</th>
-                <th className="px-4 py-3 text-right">{t('common.actions')}</th>
+                {isAdminOrGerente && <th className="px-4 py-3 text-right">{t('common.actions')}</th>}
               </tr>
             </thead>
             <tbody>
@@ -101,14 +136,16 @@ export default function CategoriasPage() {
                 <tr key={c.id} className="border-t border-gray-100 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/40">
                   <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{c.nome}</td>
                   <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{c.descricao ?? t('common.none')}</td>
-                  <td className="px-4 py-3 text-right space-x-1">
-                    <button onClick={() => abrirEditar(c)} className="text-blue-500 hover:text-blue-700 p-1 rounded" title={t('common.edit')}>
-                      <Pencil size={15} />
-                    </button>
-                    <button onClick={() => excluir(c.id)} className="text-red-500 hover:text-red-700 p-1 rounded" title={t('common.delete')}>
-                      <Trash2 size={15} />
-                    </button>
-                  </td>
+                  {isAdminOrGerente && (
+                    <td className="px-4 py-3 text-right space-x-1">
+                      <button onClick={() => abrirEditar(c)} className="text-blue-500 hover:text-blue-700 p-1 rounded" title={t('common.edit')}>
+                        <Pencil size={15} />
+                      </button>
+                      <button onClick={() => solicitarExclusao(c)} className="text-red-500 hover:text-red-700 p-1 rounded" title={t('common.delete')}>
+                        <Trash2 size={15} />
+                      </button>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -162,6 +199,17 @@ export default function CategoriasPage() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!confirmExclusao}
+        title={t('categories.deleteTitle')}
+        message={confirmExclusao ? t('categories.deleteMessage', { name: confirmExclusao.nome }) : ''}
+        confirmLabel={t('common.delete')}
+        cancelLabel={t('common.cancel')}
+        loading={excluindo}
+        onConfirm={excluir}
+        onCancel={() => setConfirmExclusao(null)}
+      />
     </div>
   );
 }

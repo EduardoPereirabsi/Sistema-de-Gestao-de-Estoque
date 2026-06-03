@@ -25,10 +25,7 @@ export default function Sidebar({ open, onToggle }: SidebarProps) {
     { to: '/usuarios', label: t('nav.users'), icon: Users },
   ];
   const gerenteLinks = adminLinks.filter((link) => link.to !== '/usuarios');
-  const operadorLinks = [
-    { to: '/estoque', label: t('nav.stock'), icon: BarChart2 },
-    { to: '/movimentacoes', label: t('nav.movements'), icon: ArrowLeftRight },
-  ];
+  const operadorLinks = gerenteLinks;
 
   const links = usuario?.perfil === 'ADMIN'
     ? adminLinks

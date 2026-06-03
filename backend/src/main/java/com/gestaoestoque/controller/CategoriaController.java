@@ -24,7 +24,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
-@PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
 @SecurityRequirement(name = "Bearer")
 @Tag(name = "Categorias", description = "CRUD de categorias de produtos")
 public class CategoriaController {
@@ -32,6 +31,7 @@ public class CategoriaController {
     private final CategoriaService categoriaService;
 
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE','OPERADOR')")
     @Operation(summary = "Listar categorias", description = "Retorna todas as categorias")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Categorias retornadas com sucesso",
@@ -46,6 +46,7 @@ public class CategoriaController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE','OPERADOR')")
     @Operation(summary = "Buscar categoria", description = "Retorna uma categoria pelo ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Categoria retornada com sucesso",
@@ -62,6 +63,7 @@ public class CategoriaController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     @Operation(summary = "Criar categoria", description = "Cadastra uma nova categoria")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Categoria criada com sucesso",
@@ -80,6 +82,7 @@ public class CategoriaController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     @Operation(summary = "Atualizar categoria", description = "Atualiza uma categoria existente")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Categoria atualizada com sucesso",
@@ -100,6 +103,7 @@ public class CategoriaController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN','GERENTE')")
     @Operation(summary = "Remover categoria", description = "Remove uma categoria pelo ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Categoria removida com sucesso"),

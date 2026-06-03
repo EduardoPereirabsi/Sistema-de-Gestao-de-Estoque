@@ -152,6 +152,26 @@ describe('App', () => {
     expect(screen.getByTestId('estoque-page')).toBeInTheDocument();
   });
 
+  it('deve permitir acesso ao painel para operador autenticado', () => {
+    mockAuth.autenticado = true;
+    mockAuth.usuario = {
+      id: 2,
+      nome: 'Operador',
+      email: 'operador@empresa.com',
+      perfil: 'OPERADOR',
+      ativo: true,
+      nomeEmpresa: 'Empresa Teste',
+    };
+
+    render(
+      <MemoryRouter initialEntries={['/painel']}>
+        <App />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByTestId('painel-page')).toBeInTheDocument();
+  });
+
   it('deve bloquear a rota de usuarios para nao admin', () => {
     mockAuth.autenticado = true;
     mockAuth.usuario = {

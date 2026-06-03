@@ -3,6 +3,8 @@ import { Plus, Pencil, Trash2, X, Search, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../services/api';
 import toast from 'react-hot-toast';
+import { useAuth } from '../contexts/AuthContext';
+import ConfirmDialog from '../components/common/ConfirmDialog';
 import type { Produto, Categoria, Fornecedor } from '../types';
 
 interface FormData {
@@ -27,6 +29,7 @@ const inputClassName = 'w-full border border-gray-300 dark:border-gray-600 bg-wh
 
 export default function ProdutosPage() {
   const { t, i18n } = useTranslation();
+  const { isAdminOrGerente } = useAuth();
   const locale = i18n.resolvedLanguage ?? i18n.language;
   const currency = locale.toLowerCase().startsWith('pt') ? 'BRL' : 'USD';
   const formatarMoeda = useMemo(
@@ -41,6 +44,8 @@ export default function ProdutosPage() {
   const [totalPaginas, setTotalPaginas] = useState(0);
   const [modal, setModal] = useState(false);
   const [editando, setEditando] = useState<Produto | null>(null);
+  const [confirmExclusao, setConfirmExclusao] = useState<Produto | null>(null);
+  const [excluindo, setExcluindo] = useState(false);
   const [form, setForm] = useState<FormData>(vazio);
   const [salvando, setSalvando] = useState(false);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
@@ -72,8 +77,20 @@ export default function ProdutosPage() {
     carregar(0, busca);
   };
 
-  const abrirNovo = () => { setEditando(null); setForm(vazio); setModal(true); };
+  const abrirNovo = () => {
+    if (!isAdminOrGerente) {
+      toast.error(t('common.permissionDenied'));
+      return;
+    }
+    setEditando(null);
+    setForm(vazio);
+    setModal(true);
+  };
   const abrirEditar = (p: Produto) => {
+    if (!isAdminOrGerente) {
+      toast.error(t('common.permissionDenied'));
+      return;
+    }
     setEditando(p);
     setForm({
       nome: p.nome,
@@ -93,6 +110,10 @@ export default function ProdutosPage() {
 
   const salvar = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isAdminOrGerente) {
+      toast.error(t('common.permissionDenied'));
+      return;
+    }
     if (!form.nome.trim()) {
       toast.error(t('products.nameRequired'));
       return;
@@ -131,15 +152,26 @@ export default function ProdutosPage() {
     }
   };
 
-  const excluir = async (id: number) => {
-    if (!confirm(t('products.deleteConfirm'))) return;
+  const solicitarExclusao = (produto: Produto) => {
+    if (!isAdminOrGerente) {
+      toast.error(t('common.permissionDenied'));
+      return;
+    }
+    setConfirmExclusao(produto);
+  };
 
+  const excluir = async () => {
+    if (!confirmExclusao) return;
+    setExcluindo(true);
     try {
-      await api.delete(`/api/products/${id}`);
+      await api.delete(`/api/products/${confirmExclusao.id}`);
       toast.success(t('products.deleted'));
+      setConfirmExclusao(null);
       carregar(pagina, busca);
     } catch {
       toast.error(t('common.error'));
+    } finally {
+      setExcluindo(false);
     }
   };
 
@@ -152,9 +184,11 @@ export default function ProdutosPage() {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{t('products.title')}</h1>
-        <button onClick={abrirNovo} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-          <Plus size={16} /> {t('products.add')}
-        </button>
+        {isAdminOrGerente && (
+          <button onClick={abrirNovo} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+            <Plus size={16} /> {t('products.add')}
+          </button>
+        )}
       </div>
 
       <form onSubmit={buscar} className="flex flex-col sm:flex-row gap-2">
@@ -187,7 +221,7 @@ export default function ProdutosPage() {
                   <th className="px-4 py-3">{t('products.category')}</th>
                   <th className="px-4 py-3">{t('products.price')}</th>
                   <th className="px-4 py-3">{t('products.quantity')}</th>
-                  <th className="px-4 py-3 text-right">{t('common.actions')}</th>
+                  {isAdminOrGerente && <th className="px-4 py-3 text-right">{t('common.actions')}</th>}
                 </tr>
               </thead>
               <tbody>
@@ -207,14 +241,16 @@ export default function ProdutosPage() {
                     <td className="px-4 py-3 text-gray-500 dark:text-gray-400">{p.categoria?.nome ?? t('products.noCategory')}</td>
                     <td className="px-4 py-3 text-gray-900 dark:text-gray-100">{formatarMoeda.format(Number(p.preco))}</td>
                     <td className={`px-4 py-3 font-medium ${p.estoqueAbaixo ? 'text-red-600 dark:text-red-300' : 'text-gray-800 dark:text-gray-100'}`}>{p.quantidade}</td>
-                    <td className="px-4 py-3 text-right space-x-1">
-                      <button onClick={() => abrirEditar(p)} className="text-blue-500 hover:text-blue-700 p-1 rounded" title={t('common.edit')}>
-                        <Pencil size={15} />
-                      </button>
-                      <button onClick={() => excluir(p.id)} className="text-red-500 hover:text-red-700 p-1 rounded" title={t('common.delete')}>
-                        <Trash2 size={15} />
-                      </button>
-                    </td>
+                    {isAdminOrGerente && (
+                      <td className="px-4 py-3 text-right space-x-1">
+                        <button onClick={() => abrirEditar(p)} className="text-blue-500 hover:text-blue-700 p-1 rounded" title={t('common.edit')}>
+                          <Pencil size={15} />
+                        </button>
+                        <button onClick={() => solicitarExclusao(p)} className="text-red-500 hover:text-red-700 p-1 rounded" title={t('common.delete')}>
+                          <Trash2 size={15} />
+                        </button>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -309,6 +345,17 @@ export default function ProdutosPage() {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!confirmExclusao}
+        title={t('products.deleteTitle')}
+        message={confirmExclusao ? t('products.deleteMessage', { name: confirmExclusao.nome }) : ''}
+        confirmLabel={t('common.delete')}
+        cancelLabel={t('common.cancel')}
+        loading={excluindo}
+        onConfirm={excluir}
+        onCancel={() => setConfirmExclusao(null)}
+      />
     </div>
   );
 }

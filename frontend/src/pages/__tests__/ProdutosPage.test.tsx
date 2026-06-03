@@ -3,6 +3,8 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ProdutosPage from '../ProdutosPage';
 
+const mockUseAuth = vi.fn();
+
 vi.mock('../../services/api', () => ({
   api: {
     get: vi.fn(),
@@ -16,11 +18,16 @@ vi.mock('react-hot-toast', () => ({
   default: { success: vi.fn(), error: vi.fn() },
 }));
 
+vi.mock('../../contexts/AuthContext', () => ({
+  useAuth: () => mockUseAuth(),
+}));
+
 import { api } from '../../services/api';
 
 describe('ProdutosPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockUseAuth.mockReturnValue({ isAdminOrGerente: true });
     vi.mocked(api.get).mockImplementation((url: string) => {
       if (url.startsWith('/api/products')) {
         return Promise.resolve({
@@ -55,9 +62,31 @@ describe('ProdutosPage', () => {
 
   it('deve abrir modal ao clicar em Novo Produto', async () => {
     render(<ProdutosPage />);
+    await screen.findByText('Mouse');
 
     await userEvent.click(screen.getByRole('button', { name: /Novo Produto/i }));
 
     expect(screen.getByRole('heading', { name: 'Novo Produto' })).toBeInTheDocument();
+  });
+
+  it('deve abrir popup de confirmacao ao excluir produto', async () => {
+    render(<ProdutosPage />);
+    await screen.findByText('Mouse');
+
+    await userEvent.click(screen.getByTitle('Excluir'));
+
+    expect(screen.getByRole('heading', { name: 'Excluir produto?' })).toBeInTheDocument();
+    expect(screen.getByText('Mouse será removido das listagens, mas o histórico continuará salvo.')).toBeInTheDocument();
+  });
+
+  it('deve ocultar acoes de cadastro para operador', async () => {
+    mockUseAuth.mockReturnValue({ isAdminOrGerente: false });
+
+    render(<ProdutosPage />);
+
+    expect(await screen.findByText('Mouse')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Novo Produto/i })).not.toBeInTheDocument();
+    expect(screen.queryByTitle('Editar')).not.toBeInTheDocument();
+    expect(screen.queryByTitle('Excluir')).not.toBeInTheDocument();
   });
 });

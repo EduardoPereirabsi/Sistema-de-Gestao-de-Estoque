@@ -20,13 +20,6 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
   return autenticado ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
-function ManagerRoute({ children }: { children: React.ReactNode }) {
-  const { usuario, isAdminOrGerente, autenticado } = useAuth();
-  if (!autenticado) return <Navigate to="/login" replace />;
-  if (!isAdminOrGerente) return <Navigate to={getHomePath(usuario?.perfil)} replace />;
-  return <>{children}</>;
-}
-
 function AdminRoute({ children }: { children: React.ReactNode }) {
   const { usuario, isAdmin, autenticado } = useAuth();
   if (!autenticado) return <Navigate to="/login" replace />;
@@ -50,10 +43,10 @@ function AppRoutes() {
         }
       >
         <Route index element={<Navigate to={getHomePath(usuario?.perfil)} replace />} />
-        <Route path="painel" element={<ManagerRoute><PainelPage /></ManagerRoute>} />
-        <Route path="produtos" element={<ManagerRoute><ProdutosPage /></ManagerRoute>} />
-        <Route path="categorias" element={<ManagerRoute><CategoriasPage /></ManagerRoute>} />
-        <Route path="fornecedores" element={<ManagerRoute><FornecedoresPage /></ManagerRoute>} />
+        <Route path="painel" element={<PainelPage />} />
+        <Route path="produtos" element={<ProdutosPage />} />
+        <Route path="categorias" element={<CategoriasPage />} />
+        <Route path="fornecedores" element={<FornecedoresPage />} />
         <Route path="estoque" element={<EstoquePage />} />
         <Route path="movimentacoes" element={<MovimentacoesPage />} />
         <Route path="usuarios" element={<AdminRoute><UsuariosPage /></AdminRoute>} />
