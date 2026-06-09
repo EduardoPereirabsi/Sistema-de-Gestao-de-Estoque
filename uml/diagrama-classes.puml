@@ -1,0 +1,73 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class Empresa {
+  +id: Long
+  +nome: String
+  +cnpj: String
+  +email: String
+  +telefone: String
+  +ativo: Boolean
+}
+
+class Usuario {
+  +id: Long
+  +nome: String
+  +email: String
+  +senha: String
+  +perfil: Perfil
+  +ativo: Boolean
+}
+
+class Categoria {
+  +id: Long
+  +nome: String
+  +descricao: String
+}
+
+class Fornecedor {
+  +id: Long
+  +nome: String
+  +cnpj: String
+}
+
+class Produto {
+  +id: Long
+  +nome: String
+  +sku: String
+  +preco: BigDecimal
+  +quantidade: Integer
+  +quantidadeMinima: Integer
+}
+
+class MovimentacaoEstoque {
+  +id: Long
+  +tipo: TipoMovimentacao
+  +quantidade: Integer
+  +motivo: String
+}
+
+class AutenticacaoService
+class UsuarioService
+class ProdutoService
+class MovimentacaoEstoqueService
+class PainelService
+
+Empresa "1" -- "many" Usuario
+Empresa "1" -- "many" Categoria
+Empresa "1" -- "many" Fornecedor
+Empresa "1" -- "many" Produto
+Empresa "1" -- "many" MovimentacaoEstoque
+
+Categoria "1" -- "many" Produto
+Fornecedor "1" -- "many" Produto
+Produto "1" -- "many" MovimentacaoEstoque
+Usuario "1" -- "many" MovimentacaoEstoque
+
+AutenticacaoService ..> Usuario
+UsuarioService ..> Usuario
+ProdutoService ..> Produto
+MovimentacaoEstoqueService ..> MovimentacaoEstoque
+PainelService ..> Produto
+PainelService ..> MovimentacaoEstoque
+@enduml
