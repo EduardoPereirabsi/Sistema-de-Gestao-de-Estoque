@@ -4,6 +4,12 @@ on:
   push:
     branches: [ main ]
 
+# Grant explicit permissions required for pushing to gh-pages and Pages API
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
