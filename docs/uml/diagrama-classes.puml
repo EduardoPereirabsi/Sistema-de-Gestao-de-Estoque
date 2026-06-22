@@ -1,73 +1,170 @@
-@startuml
+@startuml diagrama-classes-implementacao
 skinparam classAttributeIconSize 0
+skinparam classFontStyle Bold
+skinparam classBackgroundColor #F5F5FF
+skinparam classBorderColor #444488
+skinparam arrowColor #333366
 
-class Empresa {
-  +id: Long
-  +nome: String
-  +cnpj: String
-  +email: String
-  +telefone: String
-  +ativo: Boolean
+title Diagrama de Classes — Visão de Implementação\nSmartStock (Java 21 + Spring Boot 3 / TypeScript + React)
+
+' ─── Enumerações ───────────────────────────────────────────
+enum Perfil <<enumeration>> {
+  ADMIN
+  GERENTE
+  OPERADOR
 }
 
-class Usuario {
-  +id: Long
-  +nome: String
-  +email: String
-  +senha: String
-  +perfil: Perfil
-  +ativo: Boolean
+enum TipoMovimentacao <<enumeration>> {
+  ENTRADA
+  SAIDA
+  AJUSTE
 }
 
-class Categoria {
-  +id: Long
-  +nome: String
-  +descricao: String
+' ─── Entidades de Domínio ──────────────────────────────────
+class Empresa <<Entity>> {
+  -id: Long
+  -nome: String
+  -cnpj: String
+  -email: String
+  -telefone: String
+  -ativo: Boolean
+  -criadoEm: LocalDateTime
 }
 
-class Fornecedor {
-  +id: Long
-  +nome: String
-  +cnpj: String
+class Usuario <<Entity>> {
+  -id: Long
+  -nome: String
+  -email: String
+  -senha: String
+  -perfil: Perfil
+  -ativo: Boolean
+  -tokenRecuperacao: String
+  -tokenRecuperacaoExpiracao: LocalDateTime
+  -criadoEm: LocalDateTime
 }
 
-class Produto {
-  +id: Long
-  +nome: String
-  +sku: String
-  +preco: BigDecimal
-  +quantidade: Integer
-  +quantidadeMinima: Integer
+class Categoria <<Entity>> {
+  -id: Long
+  -nome: String
+  -descricao: String
+  -ativo: Boolean
+  -criadoEm: LocalDateTime
 }
 
-class MovimentacaoEstoque {
-  +id: Long
-  +tipo: TipoMovimentacao
-  +quantidade: Integer
-  +motivo: String
+class Fornecedor <<Entity>> {
+  -id: Long
+  -nome: String
+  -cnpj: String
+  -email: String
+  -telefone: String
+  -endereco: String
+  -ativo: Boolean
+  -criadoEm: LocalDateTime
 }
 
-class AutenticacaoService
-class UsuarioService
-class ProdutoService
-class MovimentacaoEstoqueService
-class PainelService
+class Produto <<Entity>> {
+  -id: Long
+  -nome: String
+  -sku: String
+  -descricao: String
+  -preco: BigDecimal
+  -precoCusto: BigDecimal
+  -quantidade: Integer
+  -quantidadeMinima: Integer
+  -urlImagem: String
+  -ativo: Boolean
+  -criadoEm: LocalDateTime
+  -atualizadoEm: LocalDateTime
+  +isEstoqueAbaixo(): boolean
+}
 
-Empresa "1" -- "many" Usuario
-Empresa "1" -- "many" Categoria
-Empresa "1" -- "many" Fornecedor
-Empresa "1" -- "many" Produto
-Empresa "1" -- "many" MovimentacaoEstoque
+class MovimentacaoEstoque <<Entity>> {
+  -id: Long
+  -tipo: TipoMovimentacao
+  -quantidade: Integer
+  -motivo: String
+  -criadoEm: LocalDateTime
+}
 
-Categoria "1" -- "many" Produto
-Fornecedor "1" -- "many" Produto
-Produto "1" -- "many" MovimentacaoEstoque
-Usuario "1" -- "many" MovimentacaoEstoque
+' ─── Serviços ─────────────────────────────────────────────
+class AutenticacaoService <<Service>> {
+  +login(request: LoginRequest): AutenticacaoResponse
+  +cadastrar(request: CadastroRequest): AutenticacaoResponse
+  +refresh(token: String): AutenticacaoResponse
+  +esquecerSenha(request: EsqueciSenhaRequest): void
+  +redefinirSenha(request: RedefinirSenhaRequest): void
+}
 
-AutenticacaoService ..> Usuario
-UsuarioService ..> Usuario
-ProdutoService ..> Produto
-MovimentacaoEstoqueService ..> MovimentacaoEstoque
-PainelService ..> Produto
-PainelService ..> MovimentacaoEstoque
+class UsuarioService <<Service>> {
+  +findAll(): List<UsuarioResponse>
+  +create(request: UsuarioCriarRequest): UsuarioResponse
+  +update(id: Long, request: UsuarioAtualizarRequest): UsuarioResponse
+  +delete(id: Long): void
+}
+
+class ProdutoService <<Service>> {
+  +findAll(pageable: Pageable): Page<ProdutoResponse>
+  +findById(id: Long): ProdutoResponse
+  +search(nome: String, pageable: Pageable): Page<ProdutoResponse>
+  +findLowStock(): List<ProdutoResponse>
+  +create(request: ProdutoRequest): ProdutoResponse
+  +update(id: Long, request: ProdutoRequest): ProdutoResponse
+  +delete(id: Long): void
+}
+
+class MovimentacaoEstoqueService <<Service>> {
+  +findAll(pageable: Pageable): Page<MovimentacaoResponse>
+  +create(request: MovimentacaoRequest): MovimentacaoResponse
+}
+
+class PainelService <<Service>> {
+  +getPainel(): PainelResponse
+  +getGraficoDiario(dias: int): List<GraficoDiarioResponse>
+}
+
+class CategoriaService <<Service>> {
+  +findAll(): List<CategoriaResponse>
+  +create(request: CategoriaRequest): CategoriaResponse
+  +update(id: Long, request: CategoriaRequest): CategoriaResponse
+  +delete(id: Long): void
+}
+
+class FornecedorService <<Service>> {
+  +findAll(): List<FornecedorResponse>
+  +create(request: FornecedorRequest): FornecedorResponse
+  +update(id: Long, request: FornecedorRequest): FornecedorResponse
+  +delete(id: Long): void
+}
+
+' ─── Segurança ────────────────────────────────────────────
+class JwtTokenProvider <<Component>> {
+  +generateAccessToken(userId: Long): String
+  +generateRefreshToken(userId: Long): String
+  +validateToken(token: String): boolean
+  +getUserIdFromToken(token: String): Long
+}
+
+' ─── Relacionamentos entre Entidades ──────────────────────
+Empresa "1" *-- "0..*" Usuario           : empresa
+Empresa "1" *-- "0..*" Categoria         : empresa
+Empresa "1" *-- "0..*" Fornecedor        : empresa
+Empresa "1" *-- "0..*" Produto           : empresa
+Empresa "1" *-- "0..*" MovimentacaoEstoque : empresa
+
+Categoria  "0..1" -- "0..*" Produto            : categoria
+Fornecedor "0..1" -- "0..*" Produto            : fornecedor
+Produto    "1"    -- "0..*" MovimentacaoEstoque : produto
+Usuario    "1"    -- "0..*" MovimentacaoEstoque : usuario
+
+' ─── Relacionamentos entre Serviços e Entidades ───────────
+AutenticacaoService  ..>  Usuario                 : usa
+AutenticacaoService  ..>  JwtTokenProvider        : usa
+UsuarioService       ..>  Usuario                 : gerencia
+ProdutoService       ..>  Produto                 : gerencia
+MovimentacaoEstoqueService ..> MovimentacaoEstoque : gerencia
+MovimentacaoEstoqueService ..> Produto             : atualiza estoque
+PainelService        ..>  Produto                 : consulta
+PainelService        ..>  MovimentacaoEstoque      : consulta
+CategoriaService     ..>  Categoria               : gerencia
+FornecedorService    ..>  Fornecedor              : gerencia
 @enduml

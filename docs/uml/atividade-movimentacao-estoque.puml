@@ -1,32 +1,70 @@
-@startuml
+@startuml atividade-movimentacao-estoque
+title Diagrama de Atividades — Caso de Uso Principal (Core)\nSmartStock: Registrar Movimentação de Estoque
+
+skinparam activityBackgroundColor #FAFFF0
+skinparam activityBorderColor #336600
+skinparam arrowColor #333333
+skinparam swimlaneBorderColor #888888
+
+|Operador / Gerente|
 start
-:Receber tipo, produto, quantidade e motivo;
-:Buscar produto na empresa atual;
+:Acessa tela de Movimentações;
+:Seleciona produto, tipo de movimentação\n(ENTRADA / SAÍDA / AJUSTE),\nquantidade e motivo;
+:Confirma o registro;
 
-if (Produto existe?) then (sim)
-  if (Tipo = SAIDA?) then (sim)
-    if (Quantidade disponivel >= solicitada?) then (sim)
-      :Subtrair do estoque;
-    else (nao)
-      :Retornar erro de estoque insuficiente;
+|Sistema (Frontend)|
+:Envia requisição\nPOST /api/stock-movements;
+
+|Sistema (Backend — Service)|
+:Obtém contexto da empresa autenticada;
+:Busca produto pelo ID na empresa;
+
+if (Produto existe e está ativo?) then (não)
+  :Retorna 404 — Produto não encontrado;
+  |Operador / Gerente|
+  :Exibe mensagem de erro;
+  stop
+else (sim)
+  if (Tipo == SAÍDA?) then (sim)
+    if (Estoque disponível >= quantidade solicitada?) then (não)
+      :Lança EstoqueInsuficienteException;
+      |Sistema (Frontend)|
+      :Retorna 422 — Estoque insuficiente;
+      |Operador / Gerente|
+      :Exibe alerta de estoque insuficiente;
       stop
+    else (sim)
+      |Sistema (Backend — Service)|
+      :Subtrai quantidade do estoque\nproduto.quantidade -= solicitado;
     endif
-  elseif (Tipo = ENTRADA?) then (sim)
-    :Somar ao estoque;
+  elseif (Tipo == ENTRADA?) then (sim)
+    :Soma quantidade ao estoque\nproduto.quantidade += solicitado;
   else (AJUSTE)
-    :Definir quantidade absoluta;
+    :Define quantidade absoluta\nproduto.quantidade = solicitado;
   endif
 
-  :Persistir produto;
-  :Persistir movimentacao;
+  :Persiste produto com nova quantidade\n(ProdutoRepository.save);
+  :Cria e persiste registro de MovimentacaoEstoque\n(auditoria imutável);
 
-  if (Estoque abaixo do minimo?) then (sim)
-    :Publicar alerta via WebSocket;
+  if (Estoque abaixo do mínimo?) then (sim)
+    fork
+      :Publica alerta via WebSocket\n/topic/low-stock;
+    fork again
+      :Retorna MovimentacaoResponse\n(201 Created);
+    end fork
+    |Sistema (Frontend)|
+    :Exibe notificação de estoque baixo em tempo real;
+    :Atualiza listagem de movimentações;
+    |Operador / Gerente|
+    :Visualiza confirmação e alerta de estoque;
+  else (não)
+    |Sistema (Backend — Service)|
+    :Retorna MovimentacaoResponse\n(201 Created);
+    |Sistema (Frontend)|
+    :Atualiza listagem de movimentações;
+    |Operador / Gerente|
+    :Visualiza confirmação do registro;
   endif
-
-  :Retornar movimentacao criada;
-else (nao)
-  :Retornar produto nao encontrado;
 endif
 
 stop
