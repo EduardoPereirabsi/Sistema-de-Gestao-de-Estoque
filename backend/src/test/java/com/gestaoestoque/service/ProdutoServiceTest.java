@@ -149,14 +149,14 @@ class ProdutoServiceTest {
         var pageable = PageRequest.of(0, 10);
 
         when(empresaContexto.getCurrentCompanyId()).thenReturn(1L);
-        when(produtoRepository.findByNomeContainingIgnoreCaseAndEmpresaId("Notebook", 1L, pageable))
+        when(produtoRepository.findByNomeContainingIgnoreCaseAndEmpresaIdAndAtivoTrue("Notebook", 1L, pageable))
                 .thenReturn(new PageImpl<>(List.of(produto), pageable, 1));
 
         var response = produtoService.search("Notebook", pageable);
 
         assertThat(response.getContent()).hasSize(1);
         assertThat(response.getContent().get(0).getNome()).isEqualTo("Notebook Gamer");
-        verify(produtoRepository).findByNomeContainingIgnoreCaseAndEmpresaId("Notebook", 1L, pageable);
+        verify(produtoRepository).findByNomeContainingIgnoreCaseAndEmpresaIdAndAtivoTrue("Notebook", 1L, pageable);
     }
 
     @Test

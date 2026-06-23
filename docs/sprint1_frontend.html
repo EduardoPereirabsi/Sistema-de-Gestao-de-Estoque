@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SmartStock - Sprint 1 (Protótipo)</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; }
+    .container { max-width: 720px; margin: auto; }
+    header { text-align: center; margin-bottom: 24px; }
+    form { border: 1px solid #ddd; padding: 16px; border-radius: 6px; }
+    label { display:block; margin-top:8px; }
+    input[type=text], input[type=password] { width:100%; padding:8px; margin-top:4px; }
+    .categories { margin-top:20px; }
+    .category { padding:8px; border-bottom:1px solid #eee; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>SmartStock — Protótipo Sprint 1</h1>
+      <p>Login e visualização básica de categorias (estática)</p>
+    </header>
+
+    <section>
+      <form id="loginForm">
+        <h2>Entrar</h2>
+        <label for="email">Email</label>
+        <input id="email" type="text" placeholder="seu@email.com">
+        <label for="password">Senha</label>
+        <input id="password" type="password" placeholder="Senha">
+        <button type="button" onclick="fakeLogin()">Entrar</button>
+      </form>
+    </section>
+
+    <section class="categories" id="categories">
+      <h2>Categorias (exemplo)</h2>
+      <div class="category">1. Materiais de Escritório</div>
+      <div class="category">2. Materiais de Limpeza</div>
+      <div class="category">3. Ferramentas</div>
+    </section>
+  </div>
+
+  <script>
+    function fakeLogin(){
+      alert('Login simulado. Em produção, conectar ao endpoint /auth/login e trocar para a página principal.');
+    }
+  </script>
+</body>
+</html>

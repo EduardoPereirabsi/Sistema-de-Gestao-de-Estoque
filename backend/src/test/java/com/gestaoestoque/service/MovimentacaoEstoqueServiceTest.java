@@ -101,7 +101,7 @@ class MovimentacaoEstoqueServiceTest {
 
         when(empresaContexto.getCurrentCompanyId()).thenReturn(1L);
         when(empresaContexto.getCurrentUser()).thenReturn(usuario);
-        when(produtoRepository.findById(1L)).thenReturn(Optional.of(produto));
+        when(produtoRepository.findByIdAndEmpresaIdAndAtivoTrue(1L, 1L)).thenReturn(Optional.of(produto));
         when(movimentacaoRepository.save(any(MovimentacaoEstoque.class))).thenAnswer(invocation -> {
             MovimentacaoEstoque movimentacao = invocation.getArgument(0);
             movimentacao.setId(10L);
@@ -120,31 +120,13 @@ class MovimentacaoEstoqueServiceTest {
 
     @Test
     void create_deveLancarExcecaoQuandoProdutoNaoPertenceEmpresaAtual() {
-        Empresa outraEmpresa = Empresa.builder()
-                .id(2L)
-                .nome("Outra Empresa")
-                .cnpj("11.111.111/0001-11")
-                .ativo(true)
-                .build();
-
-        Produto produtoOutraEmpresa = Produto.builder()
-                .id(1L)
-                .nome("Produto Externo")
-                .sku("EXT-001")
-                .quantidade(10)
-                .quantidadeMinima(2)
-                .empresa(outraEmpresa)
-                .preco(BigDecimal.TEN)
-                .precoCusto(BigDecimal.ONE)
-                .build();
-
         MovimentacaoRequest request = new MovimentacaoRequest();
         request.setProdutoId(1L);
         request.setTipo(TipoMovimentacao.ENTRADA);
         request.setQuantidade(5);
 
         when(empresaContexto.getCurrentCompanyId()).thenReturn(1L);
-        when(produtoRepository.findById(1L)).thenReturn(Optional.of(produtoOutraEmpresa));
+        when(produtoRepository.findByIdAndEmpresaIdAndAtivoTrue(1L, 1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> movimentacaoEstoqueService.create(request))
                 .isInstanceOf(RecursoNaoEncontradoException.class)
@@ -161,7 +143,7 @@ class MovimentacaoEstoqueServiceTest {
         request.setQuantidade(10);
 
         when(empresaContexto.getCurrentCompanyId()).thenReturn(1L);
-        when(produtoRepository.findById(1L)).thenReturn(Optional.of(produto));
+        when(produtoRepository.findByIdAndEmpresaIdAndAtivoTrue(1L, 1L)).thenReturn(Optional.of(produto));
 
         assertThatThrownBy(() -> movimentacaoEstoqueService.create(request))
                 .isInstanceOf(EstoqueInsuficienteException.class)
@@ -183,7 +165,7 @@ class MovimentacaoEstoqueServiceTest {
 
         when(empresaContexto.getCurrentCompanyId()).thenReturn(1L);
         when(empresaContexto.getCurrentUser()).thenReturn(usuario);
-        when(produtoRepository.findById(1L)).thenReturn(Optional.of(produto));
+        when(produtoRepository.findByIdAndEmpresaIdAndAtivoTrue(1L, 1L)).thenReturn(Optional.of(produto));
         when(movimentacaoRepository.save(any(MovimentacaoEstoque.class))).thenAnswer(invocation -> {
             MovimentacaoEstoque movimentacao = invocation.getArgument(0);
             movimentacao.setId(20L);

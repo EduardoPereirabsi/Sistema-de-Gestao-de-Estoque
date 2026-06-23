@@ -45,7 +45,7 @@ class PainelServiceTest {
     @Test
     void getPainel_deveRetornarResumoComCamposEmPortugues() {
         when(empresaContexto.getCurrentCompanyId()).thenReturn(1L);
-        when(produtoRepository.countByEmpresaId(1L)).thenReturn(25L);
+        when(produtoRepository.countByEmpresaIdAndAtivoTrue(1L)).thenReturn(25L);
         when(categoriaRepository.findByEmpresaId(1L)).thenReturn(List.of(
                 com.gestaoestoque.entity.Categoria.builder().id(1L).nome("Cat").build()
         ));
