@@ -1,0 +1,80 @@
+SmartStock — Planejamento de Requisitos e Processos
+Projeto: SmartStock
+Participantes: Eduardo Pereira, Matheus Fraiz, Patrick de Oliveira
+
+1) Planning Poker — Quadro de requisitos funcionais
+Formato: Requisito | Eduardo (antes) | Matheus (antes) | Patrick (antes) | Consenso (nota) | Justificativa | Complexidade | Prazo (horas/dias)
+
+RF01 - Cadastro de empresa e usuário administrador inicial | 3 | 2 | 3 | 3 | Necessário para inicializar plataforma; complexidade média por validações e segurança | Média | 16h
+RF02 - Autenticação JWT | 5 | 3 | 5 | 5 | Autenticação e refresh tokens exigem segurança e integração com backend | Alta | 40h
+RF03 - Login multiempresa | 3 | 5 | 3 | 3 | Interface de escolha de empresa + mapeamento de sessão; moderado | Média | 24h
+RF04 - CRUD categorias por empresa | 2 | 2 | 2 | 2 | CRUD simples isolado por empresa | Baixa | 12h
+RF05 - CRUD fornecedores por empresa | 3 | 3 | 2 | 3 | Formulários e relacionamentos, validações | Média | 16h
+RF06 - CRUD produtos por empresa | 5 | 5 | 5 | 5 | Cadastro com SKU único, preços, estoque mínimo — criticidade maior | Alta | 40h
+RF07 - Registro movimentações (entrada/saída/ajuste) | 5 | 8 | 5 | 5 | Regras de negócio e integridade do estoque; prevenção de saídas indevidas | Alta | 48h
+RF08 - Bloquear saídas com estoque insuficiente | 3 | 3 | 3 | 3 | Regra simples, mas crítica; testes necessários | Média | 16h
+RF09 - Dashboard resumo e gráfico diário | 5 | 5 | 5 | 5 | Consolidação e performance para dados agregados | Alta | 40h
+RF10 - Gestão de usuários por perfil | 3 | 3 | 3 | 3 | Permissões e fluxo administrativo | Média | 24h
+RF11 - Alerta estoque baixo via WebSocket | 3 | 5 | 3 | 3 | Implementação de push em tempo real; infra necessária | Média | 20h
+RF12 - Frontend tema claro/escuro e idioma | 2 | 2 | 2 | 2 | Reuso de CSS/arquitetura i18n; baixo esforço | Baixa | 12h
+
+(Na coluna "antes" cada participante atribuiu sua estimativa individual. A coluna "Consenso" registra a nota acordada após discussão — ver justificativas resumidas.)
+
+2) Scrum — Organização do projeto
+Product Backlog (prioridades decrescentes):
+- RF02 Autenticação JWT (P0)
+- RF06 CRUD produtos (P0)
+- RF07 Movimentações (P0)
+- RF09 Dashboard (P1)
+- RF01 Cadastro empresa/usuário (P1)
+- RF04 Categorias (P2)
+- RF05 Fornecedores (P2)
+- RF08 Bloqueio saídas (P1)
+- RF10 Gestão usuários (P2)
+- RF11 Alertas WebSocket (P2)
+- RF03 Login multiempresa (P3)
+- RF12 Tema/idioma (P3)
+
+Sprint planning (exemplo):
+Sprint 1 (2 semanas — 80h): Autenticação (backend) + Frontend inicial (login, seleção de empresa) + CRUD Categorias (frontend+backend) — estimativa 80h
+Sprint 2 (2 semanas — 80h): CRUD Produtos + fornecedores (back+front)
+Sprint 3 (2 semanas — 80h): Movimentações de estoque + regras (bloqueio)
+Sprint 4 (2 semanas — 80h): Dashboard, alertas e polimentos
+
+Sprint Backlog (Sprint 1) — horas de desenvolvimento:
+- Implementar endpoint de login JWT: 24h
+- Implementar refresh token: 8h
+- Página de login HTML/CSS: 12h
+- Seleção de empresa pós-login: 8h
+- CRUD Categorias (backend): 12h
+- CRUD Categorias (frontend): 16h
+Total: 80h
+
+Desenvolvimento Front-end Sprint 1 (HTML)
+Arquivo anexo: sprint1_frontend.html (no mesmo diretório)
+Conteúdo: página de login, formulário e lista de categorias estática (simples HTML/CSS) — ver arquivo gerado.
+
+Reuniões a documentar (modelos e exemplos preenchidos):
+- Scrum diário (Daily Standup): 15 minutos, template: Data | Quem | O que fiz ontem | O que farei hoje | Impedimentos
+- Revisão de Sprint: template com objetivos entregues, demos e feedback
+- Retrospectiva: template Start/Stop/Continue e ações
+
+Exemplo (diário):
+2026-06-10 | Eduardo | Implementando login | Testes unitários do auth | Dependência: endpoint de tokens não disponível
+
+3) Kanban — Quadro
+Colunas: Backlog | Análise | Desenvolvimento | Teste | Pronto
+Exemplo de cartões (com prioridade e estimativa):
+- [RF02] Autenticação JWT — P0 — 40h — move: Backlog -> Análise
+- [RF06] CRUD Produtos — P0 — 40h — move: Backlog
+
+Anexos e artefatos
+- sprint1_frontend.html (HTML de referência)
+- Templates de reuniões (incluídos no documento)
+
+Observações
+- Participantes: Eduardo Pereira (PO/Dev), Matheus Fraiz (Dev), Patrick de Oliveira (Dev/Tester)
+- Caso deseje estimativas distintas ou votos reais, posso ajustar a tabela Planning Poker com os valores que enviar.
+
+---
+Documento gerado automaticamente pelo assistente. Se quiser que eu preencha as atas das reuniões com entradas reais, cole as notas ou autorize gerar exemplos fictícios.
