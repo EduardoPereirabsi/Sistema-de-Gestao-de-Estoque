@@ -1,31 +1,54 @@
-@startuml
-actor Usuario
-participant "LoginPage" as LoginPage
-participant "AuthContext" as AuthContext
-participant "AutenticacaoController" as Controller
-participant "AutenticacaoService" as Service
-participant "JwtTokenProvider" as Jwt
+@startuml sequencia-login
+title Diagrama de Sequência — Login (com suporte multiempresa)\nSmartStock
 
-Usuario -> LoginPage : informa email e senha
+actor "Usuário" as Usuario
+participant "LoginPage\n(React)" as LoginPage
+participant "AuthContext\n(React)" as AuthContext
+participant "AutenticacaoController\n(Spring)" as Controller
+participant "AutenticacaoService\n(Spring)" as Service
+participant "UsuarioRepository\n(JPA)" as Repo
+participant "JwtTokenProvider\n(Spring)" as Jwt
+
+== Início do fluxo de login ==
+
+Usuario -> LoginPage : informa e-mail e senha
 LoginPage -> AuthContext : login(email, senha)
-AuthContext -> Controller : POST /api/auth/login
-Controller -> Service : login(request)
-Service -> Service : buscar usuarios por email
+AuthContext -> Controller : POST /api/auth/login\n{ email, senha }
+Controller -> Service : login(loginRequest)
+Service -> Repo : findByEmail(email)
 
-alt email vinculado a mais de uma empresa
-  Service --> Controller : lista de empresas
-  Controller --> AuthContext : empresas
-  AuthContext --> LoginPage : empresas disponiveis
-  Usuario -> LoginPage : seleciona empresa
-  LoginPage -> AuthContext : login(email, senha, empresaId)
-  AuthContext -> Controller : POST /api/auth/login
-  Controller -> Service : login(request com empresaId)
+alt E-mail não cadastrado
+  Repo --> Service : Optional.empty()
+  Service --> Controller : RecursoNaoEncontradoException
+  Controller --> AuthContext : 404 Not Found
+  AuthContext --> LoginPage : credenciais inválidas
+  LoginPage --> Usuario : exibe mensagem de erro
 end
 
+Repo --> Service : List<Usuario> (um ou mais vínculos de empresa)
+
+== Seleção de empresa (login multiempresa) ==
+
+alt Usuário vinculado a mais de uma empresa
+  Service --> Controller : lista de empresas disponíveis
+  Controller --> AuthContext : 200 OK — { empresas: [...] }
+  AuthContext --> LoginPage : lista de empresas para seleção
+  LoginPage --> Usuario : exibe seletor de empresa
+  Usuario -> LoginPage : seleciona empresa desejada
+  LoginPage -> AuthContext : login(email, senha, empresaId)
+  AuthContext -> Controller : POST /api/auth/login\n{ email, senha, empresaId }
+  Controller -> Service : login(loginRequest com empresaId)
+end
+
+== Geração de tokens ==
+
 Service -> Jwt : generateAccessToken(userId)
+Jwt --> Service : accessToken (JWT)
 Service -> Jwt : generateRefreshToken(userId)
-Service --> Controller : tokens + usuario
-Controller --> AuthContext : resposta autenticada
-AuthContext --> LoginPage : sessao ativa
-LoginPage --> Usuario : redireciona para o sistema
+Jwt --> Service : refreshToken (JWT)
+Service --> Controller : AutenticacaoResponse\n{ accessToken, refreshToken, usuario }
+Controller --> AuthContext : 200 OK
+AuthContext -> AuthContext : persiste tokens (localStorage)
+AuthContext --> LoginPage : sessão ativa
+LoginPage --> Usuario : redireciona para o Dashboard
 @enduml

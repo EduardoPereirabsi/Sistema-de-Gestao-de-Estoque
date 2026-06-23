@@ -1,0 +1,79 @@
+@startuml sequencia-crud-produtos
+title Diagrama de Sequência — CRUD de Produtos\nSmartStock
+
+actor "Gerente/Admin" as Gerente
+participant "ProdutosPage\n(React)" as Frontend
+participant "ProdutoController\n(Spring)" as Controller
+participant "ProdutoService\n(Spring)" as Service
+participant "ProdutoRepository\n(JPA)" as Repo
+participant "CategoriaRepository\n(JPA)" as CatRepo
+
+== Listar Produtos ==
+
+Gerente -> Frontend : acessa tela de Produtos
+Frontend -> Controller : GET /api/products?page=0&size=20\n[Authorization: Bearer <token>]
+Controller -> Service : findAll(pageable)
+Service -> Repo : findByEmpresaIdAndAtivoTrue(empresaId, pageable)
+Repo --> Service : Page<Produto>
+Service --> Controller : Page<ProdutoResponse>
+Controller --> Frontend : 200 OK — lista paginada
+Frontend --> Gerente : exibe tabela de produtos
+
+== Cadastrar Produto ==
+
+Gerente -> Frontend : preenche formulário\n(nome, SKU, preço, categoria, etc.)
+Frontend -> Controller : POST /api/products\n{ nome, sku, preco, categoriaId, ... }
+Controller -> Service : create(ProdutoRequest)
+Service -> Repo : existsBySkuAndEmpresaId(sku, empresaId)
+
+alt SKU já cadastrado na empresa
+  Repo --> Service : true
+  Service --> Controller : RecursoDuplicadoException
+  Controller --> Frontend : 409 Conflict — "SKU já cadastrado"
+  Frontend --> Gerente : exibe mensagem de erro
+else SKU disponível
+  Repo --> Service : false
+  Service -> CatRepo : findById(categoriaId)
+  CatRepo --> Service : Optional<Categoria>
+  Service -> Repo : save(produto)
+  Repo --> Service : Produto persistido
+  Service --> Controller : ProdutoResponse
+  Controller --> Frontend : 201 Created
+  Frontend --> Gerente : produto cadastrado com sucesso
+end
+
+== Atualizar Produto ==
+
+Gerente -> Frontend : edita dados do produto e confirma
+Frontend -> Controller : PUT /api/products/{id}\n{ nome, sku, preco, ... }
+Controller -> Service : update(id, ProdutoRequest)
+Service -> Repo : findByIdAndEmpresaIdAndAtivoTrue(id, empresaId)
+
+alt Produto não encontrado
+  Repo --> Service : Optional.empty()
+  Service --> Controller : RecursoNaoEncontradoException
+  Controller --> Frontend : 404 Not Found
+  Frontend --> Gerente : produto não encontrado
+else Produto encontrado
+  Repo --> Service : Produto
+  Service -> Repo : save(produto atualizado)
+  Repo --> Service : Produto salvo
+  Service --> Controller : ProdutoResponse
+  Controller --> Frontend : 200 OK
+  Frontend --> Gerente : produto atualizado com sucesso
+end
+
+== Remover Produto (soft delete) ==
+
+Gerente -> Frontend : clica em "Remover produto"
+Frontend -> Controller : DELETE /api/products/{id}
+Controller -> Service : delete(id)
+Service -> Repo : findByIdAndEmpresaIdAndAtivoTrue(id, empresaId)
+Repo --> Service : Produto
+Service -> Service : produto.setAtivo(false)
+Service -> Repo : save(produto inativado)
+Repo --> Service : ok
+Service --> Controller : void
+Controller --> Frontend : 204 No Content
+Frontend --> Gerente : produto removido da listagem
+@enduml

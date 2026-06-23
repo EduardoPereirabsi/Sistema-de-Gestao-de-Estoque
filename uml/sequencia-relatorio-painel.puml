@@ -1,0 +1,64 @@
+@startuml sequencia-relatorio-painel
+title Diagrama de Sequência — Relatório / Dashboard (Painel)\nSmartStock
+
+actor "Gestor/Admin" as Gestor
+participant "PainelPage\n(React)" as Frontend
+participant "PainelController\n(Spring)" as Controller
+participant "PainelService\n(Spring)" as Service
+participant "ProdutoRepository\n(JPA)" as ProdRepo
+participant "CategoriaRepository\n(JPA)" as CatRepo
+participant "FornecedorRepository\n(JPA)" as FornRepo
+participant "MovimentacaoRepository\n(JPA)" as MovRepo
+
+== Carregar cards de resumo ==
+
+Gestor -> Frontend : acessa o Dashboard
+Frontend -> Controller : GET /api/painel\n[Authorization: Bearer <token>]
+Controller -> Service : getPainel()
+
+Service -> ProdRepo : countByEmpresaIdAndAtivoTrue(empresaId)
+ProdRepo --> Service : totalProdutos: Long
+
+Service -> CatRepo : findByEmpresaId(empresaId)
+CatRepo --> Service : List<Categoria>
+
+Service -> FornRepo : findByEmpresaId(empresaId)
+FornRepo --> Service : List<Fornecedor>
+
+Service -> ProdRepo : calculateTotalStockValueByEmpresaId(empresaId)
+ProdRepo --> Service : valorTotalEstoque: BigDecimal
+
+Service -> ProdRepo : countLowStockProductsByEmpresaId(empresaId)
+ProdRepo --> Service : produtosAbaixoMinimo: Long
+
+Service -> MovRepo : countMovementsThisMonthByEmpresaId(empresaId)
+MovRepo --> Service : movimentacoesMes: Long
+
+Service --> Controller : PainelResponse\n{ totalProdutos, totalCategorias, totalFornecedores,\n  valorTotalEstoque, produtosAbaixoMinimo, movimentacoesMes }
+Controller --> Frontend : 200 OK
+Frontend --> Gestor : exibe cards do painel
+
+== Carregar gráfico de movimentações diárias ==
+
+Frontend -> Controller : GET /api/painel/grafico?dias=7
+Controller -> Service : getGraficoDiario(7)
+Service -> MovRepo : countByTipoAndDataGrouped(empresaId, dataInicio)
+MovRepo --> Service : List<Object[]> — [tipo, data, total]
+Service -> Service : agrupar por data e tipo\n(ENTRADA / SAÍDA / AJUSTE)
+Service --> Controller : List<GraficoDiarioResponse>\n[{ data, entradas, saidas, ajustes }, ...]
+Controller --> Frontend : 200 OK
+Frontend --> Gestor : renderiza gráfico de barras (7 dias)
+
+== Consultar produtos com estoque baixo ==
+
+Frontend -> Controller : GET /api/products/low-stock
+Controller -> Service : findLowStock()
+note right of Service
+  Delega para ProdutoService
+end note
+Service -> ProdRepo : findLowStockProductsByEmpresaId(empresaId)
+ProdRepo --> Service : List<Produto> (quantidade <= quantidadeMinima)
+Service --> Controller : List<ProdutoResponse>
+Controller --> Frontend : 200 OK — lista de alertas
+Frontend --> Gestor : exibe painel de alertas de estoque baixo
+@enduml

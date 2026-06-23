@@ -1,0 +1,102 @@
+@startuml diagrama-classes-negocial
+skinparam classAttributeIconSize 0
+skinparam classFontStyle Bold
+skinparam classBackgroundColor #FAFAFA
+skinparam classBorderColor #555555
+skinparam arrowColor #333333
+skinparam noteBackgroundColor #FFFFCC
+skinparam noteBorderColor #AAAAAA
+
+title Diagrama de Classes — Visão Negocial\nSmartStock — Sistema de Gestão de Estoque
+
+enum Perfil {
+  ADMINISTRADOR
+  GERENTE
+  OPERADOR
+}
+
+enum TipoMovimentacao {
+  ENTRADA
+  SAÍDA
+  AJUSTE
+}
+
+class Empresa {
+  identificador: Número Inteiro
+  nome: Texto
+  CNPJ: Texto (único)
+  e-mail: Texto
+  telefone: Texto
+  ativo: Lógico
+  cadastrado em: Data e Hora
+}
+
+class Usuario {
+  identificador: Número Inteiro
+  nome: Texto
+  e-mail: Texto
+  perfil: Perfil
+  ativo: Lógico
+  cadastrado em: Data e Hora
+}
+
+class Categoria {
+  identificador: Número Inteiro
+  nome: Texto
+  descrição: Texto
+  ativo: Lógico
+}
+
+class Fornecedor {
+  identificador: Número Inteiro
+  nome: Texto
+  CNPJ: Texto
+  e-mail: Texto
+  telefone: Texto
+  endereço: Texto
+  ativo: Lógico
+}
+
+class Produto {
+  identificador: Número Inteiro
+  nome: Texto
+  SKU: Texto (único por empresa)
+  descrição: Texto
+  preço de venda: Número Decimal
+  preço de custo: Número Decimal
+  quantidade em estoque: Número Inteiro
+  quantidade mínima: Número Inteiro
+  imagem: Texto (URL)
+  ativo: Lógico
+}
+
+class MovimentacaoEstoque {
+  identificador: Número Inteiro
+  tipo: TipoMovimentacao
+  quantidade: Número Inteiro
+  motivo: Texto
+  registrado em: Data e Hora
+}
+
+note bottom of Produto
+  Alerta automático via WebSocket
+  quando quantidade <= quantidade mínima
+end note
+
+note right of MovimentacaoEstoque
+  Registro imutável de auditoria.
+  Toda alteração de estoque gera
+  uma movimentação.
+end note
+
+Empresa "1" *-- "0..*" Usuario       : possui >
+Empresa "1" *-- "0..*" Categoria     : gerencia >
+Empresa "1" *-- "0..*" Fornecedor    : cadastra >
+Empresa "1" *-- "0..*" Produto       : controla >
+Empresa "1" *-- "0..*" MovimentacaoEstoque : registra >
+
+Categoria   "0..1" -- "0..*" Produto           : classifica >
+Fornecedor  "0..1" -- "0..*" Produto           : fornece >
+Produto     "1"    -- "0..*" MovimentacaoEstoque : referenciado em >
+Usuario     "1"    -- "0..*" MovimentacaoEstoque : realiza >
+@enduml

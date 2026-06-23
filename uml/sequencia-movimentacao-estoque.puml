@@ -1,0 +1,77 @@
+@startuml sequencia-movimentacao-estoque
+title Diagrama de Sequência — Movimentação de Estoque (Core)\nSmartStock
+
+actor "Operador/Gerente" as Operador
+participant "MovimentacoesPage\n(React)" as Frontend
+participant "MovimentacaoEstoqueController\n(Spring)" as Controller
+participant "MovimentacaoEstoqueService\n(Spring)" as Service
+participant "EmpresaContexto\n(Spring)" as Contexto
+participant "ProdutoRepository\n(JPA)" as ProdRepo
+participant "MovimentacaoRepository\n(JPA)" as MovRepo
+participant "WebSocket\n(SimpMessaging)" as WS
+
+== Listar movimentações existentes ==
+
+Operador -> Frontend : acessa tela de Movimentações
+Frontend -> Controller : GET /api/stock-movements?page=0&size=20\n[Authorization: Bearer <token>]
+Controller -> Service : findAll(pageable)
+Service -> Contexto : getCurrentCompanyId()
+Contexto --> Service : empresaId: Long
+Service -> MovRepo : findByEmpresaId(empresaId, pageable)
+MovRepo --> Service : Page<MovimentacaoEstoque>
+Service --> Controller : Page<MovimentacaoResponse>
+Controller --> Frontend : 200 OK — lista paginada
+Frontend --> Operador : exibe histórico de movimentações
+
+== Registrar nova movimentação ==
+
+Operador -> Frontend : seleciona produto, tipo (ENTRADA/SAÍDA/AJUSTE),\nquantidade e motivo
+Frontend -> Controller : POST /api/stock-movements\n{ produtoId, tipo, quantidade, motivo }
+Controller -> Service : create(MovimentacaoRequest)
+Service -> Contexto : getCurrentCompanyId()
+Contexto --> Service : empresaId: Long
+Service -> ProdRepo : findByIdAndEmpresaIdAndAtivoTrue(produtoId, empresaId)
+
+alt Produto não encontrado ou inativo
+  ProdRepo --> Service : Optional.empty()
+  Service --> Controller : RecursoNaoEncontradoException
+  Controller --> Frontend : 404 Not Found
+  Frontend --> Operador : "Produto não encontrado"
+else Produto encontrado
+  ProdRepo --> Service : Produto
+
+  alt tipo == ENTRADA
+    Service -> Service : produto.quantidade += quantidade
+  else tipo == SAÍDA
+    Service -> Service : verificar: produto.quantidade >= solicitado?
+    alt Estoque insuficiente
+      Service --> Controller : EstoqueInsuficienteException
+      Controller --> Frontend : 422 Unprocessable Entity\n"Estoque insuficiente. Disponível: X, solicitado: Y"
+      Frontend --> Operador : exibe alerta de estoque insuficiente
+    else Estoque suficiente
+      Service -> Service : produto.quantidade -= quantidade
+    end
+  else tipo == AJUSTE
+    Service -> Service : produto.quantidade = quantidade (absoluto)
+  end
+
+  Service -> ProdRepo : save(produto com nova quantidade)
+  ProdRepo --> Service : Produto atualizado
+
+  Service -> Contexto : getCurrentUser()
+  Contexto --> Service : Usuario autenticado
+
+  Service -> MovRepo : save(MovimentacaoEstoque)
+  MovRepo --> Service : MovimentacaoEstoque persistida
+
+  alt produto.isEstoqueAbaixo() == true
+    Service -> WS : convertAndSend("/topic/low-stock",\n"Produto '<nome>' está com estoque baixo: X unidade(s)")
+    WS --> Frontend : push notification (WebSocket)
+    Frontend --> Operador : exibe alerta de estoque baixo em tempo real
+  end
+
+  Service --> Controller : MovimentacaoResponse
+  Controller --> Frontend : 201 Created
+  Frontend --> Operador : movimentação registrada com sucesso\n(tabela atualizada)
+end
+@enduml
